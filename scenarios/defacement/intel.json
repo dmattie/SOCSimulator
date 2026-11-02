@@ -1,0 +1,11 @@
+{
+  "entries": [
+    { "ioc": "192.168.250.70", "type": "asset", "title": "Internal asset: we1149srv", "note": "Public web server for the company website. Windows Server with IIS, PHP and MySQL; runs the website's content management system. Owner: web team. Should accept inbound web traffic only; it has no business browsing out to the internet.", "tags": ["we1149srv", "web server"] },
+    { "ioc": "we1149srv", "type": "asset", "title": "Internal asset: 192.168.250.70", "note": "See 192.168.250.70. Public web server for the company website.", "tags": [] },
+    { "ioc": "jumpingcrab.com", "type": "domain", "title": "Shared dynamic-DNS domain", "note": "A free dynamic-DNS service: anyone can register a subdomain and point it at any IP address in minutes, without verification. The parent domain tells you nothing about who owns a subdomain. Subdomains of free dynamic-DNS services turn up often in opportunistic attacks because they're free, quick and disposable.", "tags": ["dynamic dns", "ddns"] },
+    { "ioc": "python-urllib/2.7", "type": "user-agent", "title": "Script, not a browser", "note": "The default User-Agent of Python 2.7's urllib library. Browsers never send it. Seeing it against a login page means someone is automating requests.", "tags": ["python-urllib", "user-agent"] },
+    { "ioc": "extplorer", "type": "software", "title": "eXtplorer (Joomla extension)", "note": "A web-based file manager that can be installed into Joomla. A legitimate admin tool, but anyone who gets into the admin panel can use it to upload files to the web server.", "tags": ["com_extplorer", "joomla"] },
+    { "ioc": "iusr", "type": "account", "title": "Built-in IIS account", "note": "NT AUTHORITY\\IUSR is the built-in account IIS uses for anonymous web requests. It should be able to read the website's files and nothing more. A program the web server launches runs with its rights.", "tags": ["nt authority\\iusr", "iis"] },
+    { "ioc": "php-cgi.exe", "type": "process", "title": "PHP interpreter", "note": "Runs the PHP pages of the website for IIS. Normally it doesn't start other programs. php-cgi.exe launching cmd.exe is a classic web-shell pattern.", "tags": ["php"] }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "scenarios": [
+    {
+      "id": "defacement",
+      "title": "Website defacement",
+      "summary": "The company's public website is showing someone else's image. Follow the attacker from the first scan to the defacement, one guided step at a time.",
+      "mode": "guided",
+      "minutes": 15
+    },
+    {
+      "id": "ransomware",
+      "title": "Ransomware outbreak",
+      "summary": "A ransom note on a desktop and a shared drive full of unreadable files. No pointers this time: find patient zero, the way in and the damage.",
+      "mode": "open",
+      "minutes": 20
+    }
+  ]
+}

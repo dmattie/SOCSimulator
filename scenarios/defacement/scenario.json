@@ -1,0 +1,754 @@
+{
+ "id": "defacement",
+ "title": "Website defacement",
+ "mode": "guided",
+ "salt": "7a3a6a383d195ba2",
+ "brief": [
+  "10 August 2016, late afternoon. Staff report that the company's public website, imreallynotbatman.com, is showing an image that isn't theirs. You are the SOC analysts on shift.",
+  "The site runs on the web server we1149srv (192.168.250.70). You have about an hour of that afternoon's logs: network captures (sourcetype stream:*), the intrusion detection system (suricata), the firewall (fgt_utm), the web server's own access log (iis) and endpoint telemetry from the server (Sysmon).",
+  "Work out who attacked, how they got in, what they ran and how the defacement happened. Each step has an Open in SIEM button that starts you in the right place. Then decide what to do about it. All times are UTC."
+ ],
+ "scoring": {
+  "question": 100,
+  "wrong": 5,
+  "min_fraction": 0.25,
+  "decision": 50,
+  "board": 10
+ },
+ "techniques": [
+  {
+   "id": "T1595.002",
+   "name": "Active Scanning: Vulnerability Scanning"
+  },
+  {
+   "id": "T1592.002",
+   "name": "Gather Victim Host Information: Software"
+  },
+  {
+   "id": "T1190",
+   "name": "Exploit Public-Facing Application"
+  },
+  {
+   "id": "T1110.001",
+   "name": "Brute Force: Password Guessing"
+  },
+  {
+   "id": "T1078",
+   "name": "Valid Accounts"
+  },
+  {
+   "id": "T1105",
+   "name": "Ingress Tool Transfer"
+  },
+  {
+   "id": "T1505.003",
+   "name": "Server Software Component: Web Shell"
+  },
+  {
+   "id": "T1059.003",
+   "name": "Command and Scripting Interpreter: Windows Command Shell"
+  },
+  {
+   "id": "T1571",
+   "name": "Non-Standard Port"
+  },
+  {
+   "id": "T1583.001",
+   "name": "Acquire Infrastructure: Domains"
+  },
+  {
+   "id": "T1491.002",
+   "name": "Defacement: External Defacement"
+  }
+ ],
+ "questions": [
+  {
+   "id": "scanner_ip",
+   "type": "text",
+   "prompt": "Which external IP address sent the most HTTP traffic to the web server?",
+   "preset": {
+    "query": "sourcetype=stream:http dest_ip=192.168.250.70"
+   },
+   "hints": [
+    {
+     "text": "Click src_ip in the field list on the left. It shows the top values and their counts.",
+     "cost": 10
+    }
+   ],
+   "card": {
+    "label": "Scanning host",
+    "ref": {
+     "diamond": "infrastructure",
+     "killchain": "recon",
+     "attack": "T1595.002"
+    }
+   },
+   "accept": [
+    "d96074cf07b892c461eb00e8065743827a558a18502812b307343be71124f1f4"
+   ],
+   "reveal": [
+    {
+     "by": "scanner_ip",
+     "iv": "sXUBzHZZ+HlIusZm",
+     "ct": "+MO/DeN2tGrqZmpGC9QcrofsZv+y/zb0E3HNr85eVdzaNyQ39OVUD9pDLhl+7adPousKFwdviByfN39SbQyq63+SBwbQdl3ZtLNf2uih7lWBOZiJ/vT8FyASwzenWoDsWd4q7kWRD82gZIhZ9f8eBY+e9idDXroaQ8I+8HAfSKDDqbMKY7NwcvfH7iVo/xvp8XFHyb3FkpGLGSpJmkavLqF0A8L1+K2zcyyu42D2QrSdMWHb3Vkiqu8ik8SjBK1873ykmZ/DAf4h6mQxAKlD0T4op5jFDWjfRjyWe5mFaHhuNuh0j8fVR4X2cMWUUAk2yyCkn4CMXwMbijivLL9EJYDCz1EdTTz3SUJD0IwFSGYvygVl"
+    },
+    {
+     "by": "instructor",
+     "iv": "JWcyQFyD6k7nqZoh",
+     "ct": "d1PGNga/ra/bOQvMoPwvPGloZPJKiuqC5kRr8HZnBcmNAlf4NtFVDyjyLK6lFVeds/bapDgHilpEaNHBLiqgYqQgs9UL95aY48dPgo4rFz6+7Z2MBfqXt2cmGVaWciOC/ds6pvMiWLZu9T5VYGQqd1CjmN4CTFgnMFVejFcybeuc1+BrKIpDZKL5riBxG30a33wBnNCvrFam+QrZ6z1GSW2qdFNBxqZtk2MzEAT74PiNhbnoVOofQLwIOPL1NnjT3kt/3RwxaS85J4M0vVyFyZZn7y+/1uY4nTNqQOgsy7EasuUmvA4jutLmoHC88gN212FS1kwBKzAdMA3IJebyLp5GxAKVtwgF22i50qqSR/7csGtP"
+    }
+   ]
+  },
+  {
+   "id": "scanner_tool",
+   "type": "text",
+   "prompt": "That traffic looks automated. Which web vulnerability scanner produced it? Give the product name.",
+   "preset": {
+    "query": "sourcetype=suricata"
+   },
+   "hints": [
+    {
+     "text": "Open the alert.signature field: these are the IDS rule names that fired.",
+     "cost": 10
+    },
+    {
+     "text": "Signatures starting \"ET SCAN\" describe scanning tools.",
+     "cost": 15
+    }
+   ],
+   "card": {
+    "label": "Scanning tool",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "recon",
+     "attack": "T1595.002"
+    }
+   },
+   "accept": [
+    "c4203c2a5bd7a407a711b8dad76b148fa6ee34907a0faea5aca070cd67bc92af",
+    "d742658ee14b9b1be06c61b3b8120a259fd7c7273e75d4fdcdb739881234805e",
+    "46dd3a265fdfc4a1c555b564a46284490afe73b53aa239468fa3c8606c6ffdea",
+    "82382a31fb315ea742677e0018e57e443edc26e40b4f5a19310589e19077d452",
+    "964839e8f22b223a6463d202b13b5b67a890ab9c1e0f8974cecec427dcc732d3"
+   ],
+   "reveal": [
+    {
+     "by": "scanner_tool",
+     "iv": "iO99+cpxw5aFo0a+",
+     "ct": "Sm9P+5dt8/roacE6ktuzFEG5YX3X2A2F5E5Gma/PMlDFcSJL2kNgF4yUZp7fmI+CbDLdQ3KoSnqXcAA9U1VJsISOQh4fA8rL9R1SrI94Xm8X+8M7VFixJ+Th5KCxIlRM1YTphafFPsuL3jINVFI31B2UTaLuDfHPb269c8e1e9YBfnLgXEUgrcdpyhmaW0pnPWUIGviMKZC2TMmSqIZ1m4jzUJBEIaENQi3bvMFnqZy/KauN6xIIGX0EgX0vHb8uJ8WH8lp4JTFzkb0yWsxnanYKG9CipRRGoxIrBD1OIqaUGQ4SvMoLVoenLhZDj8dVl/rOf1jLwA25BpYh2NDRc+zd7dsJmtWFxzD/k5DSUNQuqSemrOXnqpt3oU1jzKmr/ddqQzfIZeUzkeZIUdwOTvs="
+    },
+    {
+     "by": "scanner_tool",
+     "iv": "W4LFuHmzgRirZKcO",
+     "ct": "UmzBkHUJAnCsHaHrpPQQFMTVDAmnOyfcCjLKsltwRtIqqlOxTZwnapmXBtk95vJCljTDALSeBrBaiog5g8oLgeZanSpi5imYaigKBEKABiT9mK0xrCk2c0mUDRgxlsvX3bmBfTnIvM78S49uwc3KAYroD4TfL6n1nJU7tmchBZ4b1LAdi0hXci1V6z8vE2rhfXWJ8va4xCqckG/bG7W+a5E1dAqwJFLpJOVLyGdliL/2NcWglFOkPLwYRBWK8RhH2VUGxaU15ajz5r6EF8iLgXd/SANSURHBYXp7S464M327MDRfu8RYmx10JNVl7WivMo5bSaJZtCRzpwKsUTRrx27uk9T+UOo6vQKKE1lq2QnTxwzum0FoYTn8pej7vi0O1fLFcPvh7YjFzlVZVakNDoo="
+    },
+    {
+     "by": "scanner_tool",
+     "iv": "IJvhKYUFBDFLxIec",
+     "ct": "aYgyBGRpfDpZwY5JahPloQByPHn/9NLFBSFpsbErXV2VluxeyyMlo7LloOrUNUFY8oMkAAdV/tzx479C2b3ZSy+ZNRJstSYcomHR/uCopLuvk3WXjsFsdDAMEIvP86SG18evMalR/lQ4Pdmjgg80/6ovBwCFvdq/NeLWlThuEq6ekl2eERymba0hyF8z9zFs9B5mMobZw3KscDxpaLU39R0EaVZftWpdCW9e0KzA1j/2MEDXdTmRgH6QmylDTnTfeAaU7g831B64/4lxaZjMP5beC+AqhCMdYPmxgP5T+aY6F5FogEUmhVSkHGSN6XQlJkyP4BneVQ1bK0/uoG292+kMHEWNaln987dyVOvKKQiJee8WPdNqYItbKd3bKhcVPTvKaQ6GgTK/PCKoDcFC55M="
+    },
+    {
+     "by": "scanner_tool",
+     "iv": "ANyeumjEkboC5PAQ",
+     "ct": "MJegjDxkbSvo2sgiUkCSobO+cnEmWbhF+kiiuxRXsgZLR9C313PYs7ScGt5rVRdJ5EIXoIK7tp2Yi46RcG7CsLJvW+diloP2deawGfFp6Okz/KfID/Ro9rgwAOcP6FQP7+gs3c2apPtl/2DgYlBAITMN2sx59gSSN5HjJ0lqlOoCa9xbaEr2czCnOlUk3CdSF/pc8m7VrvYhMTl1xe71mdxexymb+JNwkehtkJvi5/B7wWS3eYClCPvpf3baPPEzGI27t/EhRs++Mxtz+kgOy1k77RQ4L2xv/LvHqQSQJfZTuOHj1aZnvGENFdhRYV5KR7s0+VQAYEhYgw5+22bfQG2GJLD7EvCzKnguE5mMQHLUgKIHIPUHg9QvZrnnSpsQY8yySTTzLo9xp9/OT+oKd3k="
+    },
+    {
+     "by": "scanner_tool",
+     "iv": "u0cWVi+yPiZxHgG4",
+     "ct": "K77IxFsDNJJG43FW7+RIKcu+KcgaPfj+TmX2MHHjlahT/Iir/UNNGyIaDTumAnteS5aAjjcod4lIFee24YMVoEFSPOsnsTr4iplJI9nqV85oW4ovVRI7xi0qB5+jo5BdzrUNd56YL1l/Jo5eF3CZIJtHPuMqj23ht9Ytm7gkwsJwA7KR4SgSvJ/3Pmrpu3kuEX+hAeNRh1JrEKVvdJjhNl/9PUWCmT96sl2kvuNDz+pMyZHXMAsTPHxIotq5fxJvYvX0U+WAzSYc/3qI3SAEC7f7KMgtJY/Zxgitd1oZApNMqLgkECwhcOqLjzJwnVNNdSsrOjrY+qfIh+c5yWxFShR0XyUlnmG8p0+wNLn7wdHWwNJGTWvH+dgpDTd0nZ0IuX0yK9hJfq2+fI09nlFgLjE="
+    },
+    {
+     "by": "instructor",
+     "iv": "4cPAwuRVLZYe1pL4",
+     "ct": "leYzcUFHi88d4CPCIz/2syQKb0NIK4e20vpOnMIAwsxBoWxN37zxSMGpiV/CGVeBzjmwjeCCIUwXrtaY/u0StdSylEisDXASkk231Xhr92TEsb23s3NKR4yiY8TEqKstJ2hOrlr86jJteQC/28Acrj90WP2AnX/SFKAjsftLVovV4o2qCvf0WDH/MI6tGF4PmQ6Ce7cLcunwa4U+JPLAwmE3kNcIehKjKWkeTP/7xpQcPvrSlvUWgZhPAMypxt+MPJSimYjkPbb6nFLViBkAIptc4JQ6nXfjynVTKor4V76DCDYwpkqEj1iyGosE2ijZ5bqf+dZkQ+DORxmUHn9pHR4YIdrklPGAgPO7UQhQdd1IjCtQFXFeEAaQLlBIKcQE1fwGYvdxzozWuklMpv/7DlA="
+    }
+   ]
+  },
+  {
+   "id": "cms",
+   "type": "choice",
+   "prompt": "Which content management system runs the website?",
+   "preset": {
+    "query": "sourcetype=stream:http dest_ip=192.168.250.70 http_method=POST"
+   },
+   "hints": [
+    {
+     "text": "Look at the uri_path values: the folder names give it away.",
+     "cost": 10
+    }
+   ],
+   "options": [
+    {
+     "id": "wp",
+     "text": "WordPress"
+    },
+    {
+     "id": "jm",
+     "text": "Joomla"
+    },
+    {
+     "id": "dr",
+     "text": "Drupal"
+    },
+    {
+     "id": "sp",
+     "text": "SharePoint"
+    }
+   ],
+   "card": {
+    "label": "Victim platform",
+    "ref": {
+     "diamond": "victim",
+     "killchain": "recon",
+     "attack": "T1592.002"
+    }
+   },
+   "accept": [
+    "05e883baecad990d1177ca78b34808b2d52c6b9f95b1c2d4df05cf826ea94374"
+   ],
+   "reveal": [
+    {
+     "by": "cms",
+     "iv": "Cehwr5wWnBrmIyQE",
+     "ct": "fh0bDirCHH6uLNg/P7mzaetIODVhmZFc6t2OXT6XGFDDX7hb0zlzZ7REsgA5dVV8CvvDiSjzR5tZmaaT7ac7os74wgtQf9rVkhpWAlTTYXf3txII+mdlG6heJWezPODHM7qCvstKP3VCBCIHwCjdXkK1tnK250EV3FVRT+3isqyCL6N9jA075JxQyCAPrV03Sun9An09ouJHCc1TrcdfVuafT1Ui55Wtvpr2BtC7eHkWdKO4wfC5Ee+n8KBwMdYvtARmzNZjNh8EA7aVEmCMqRfYROrKylojBi47Zk9x5Jdvkw=="
+    },
+    {
+     "by": "instructor",
+     "iv": "2c6wLT1JhObibXDg",
+     "ct": "GZHOiGrctaDXuG7/v615FZPl05p3S0KV2OwX/p/cXAt2vCgzjHFaW/L9JVUkfKz1LWUoN2BQf86IgSWsFVkyUIngCdTypPHZHfNssVwfDJYx6ST3Cxuk0yAuGE45E2idaTZdr582FoTsoDWH5D6eufIb00CRMQ3pUMXkGTxpq+cKwqR2RSfw1DzUMdc5R00fcp1GpJpqrX/Kb6rXOcM9WqJHyy/v2QftE4T6PlTrK+5AWyq0WyLUhSQQ/fIpsKL+cu7uACMfk4feBgvIRFDPpSXoyYnaSXlmJXrenVnwYG0mCQ=="
+    }
+   ]
+  },
+  {
+   "id": "brute_ip",
+   "type": "text",
+   "prompt": "A second external address sent hundreds of POST requests to the Joomla admin login page. Which IP address?",
+   "preset": {
+    "query": "sourcetype=stream:http http_method=POST uri_path=\"/joomla/administrator/index.php\""
+   },
+   "hints": [
+    {
+     "text": "Check src_ip in the field list. One address dominates.",
+     "cost": 10
+    }
+   ],
+   "card": {
+    "label": "Brute-force host",
+    "ref": {
+     "diamond": "infrastructure",
+     "killchain": "exploitation",
+     "attack": "T1110.001"
+    }
+   },
+   "accept": [
+    "8f94f2c73a834e37016e6445f4fa90902c7cb4ec5b4f053201f3d0ffe7f9612f"
+   ],
+   "reveal": [
+    {
+     "by": "brute_ip",
+     "iv": "daMWWiEHltx30LlS",
+     "ct": "vY6sFFEX7slE0E+TfqhKSt2So91yjdlGvI6TD8HvFGqbclKgJCTptOWwZZj0K6uxRjSoAT+cNZTjpYRWYc0gA6NNfWL2Neqp8cunyszIKA7DvE49xossV9ZX+NLPTln23v9mqcPpaEdZUr2jDQ83874C+V17x+tvc+pOZdo7o395J99IJd21F6m2aMvw6dV2Xjl29/mbQnpLZQnvY+nvWpzQW+/g2NUICmMfY0TTc0vDjX6usNqM6Z/4XqOPejHBI8NhIDla4dJMiaT/vxNWSqwsrLem5f6r5s0OSMnEHAGMmQ=="
+    },
+    {
+     "by": "instructor",
+     "iv": "CSpG1y4V1NlUdx4F",
+     "ct": "1/ytVlQ3/PUV2D6yMVaQudVlDzEtOulY6Lg/B6b67mToMBQfH0oVPl1UGjhzLgwOIbuPUVzfpysF9sPpl1G//Pbu7Wd8FoytgCdUjkznOHlXPU/wlpoHxxP9cDCt+ZkOASho8yV4p7QmN8WCkLYFWvbjjzTEf64rjdgau3ouMlea4QTJk1fwtH47C9b14PRny1qWDelP1/CdwGdoxHrwm371yKJG4Xu/T9KfxS+HAgY5IcoT1NXCyOB/A+KJcxTVOYwa713izJJFmGAGmuEP9sFd7mqmwPcSsNn/M1TNszFJhw=="
+    }
+   ]
+  },
+  {
+   "id": "password",
+   "type": "text",
+   "prompt": "Which password finally worked?",
+   "context": "The passwords tried are in the form_data field (passwd=…). A few offensive words in the attacker's password list are masked with asterisks.",
+   "preset": {
+    "query": "sourcetype=stream:http http_method=POST uri_path=\"/joomla/administrator/index.php\" form_data=*passwd=*"
+   },
+   "hints": [
+    {
+     "text": "A password that works gets used again. Look for a passwd= value that appears in more than one event.",
+     "cost": 20
+    },
+    {
+     "text": "One of these login events comes from the other attacking IP address. Use the src_ip field to find it.",
+     "cost": 20
+    }
+   ],
+   "card": {
+    "label": "Guessed admin password",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "exploitation",
+     "attack": "T1078"
+    }
+   },
+   "accept": [
+    "3a915e8fd059200c2229c7f65565a8383d61eec84efbfd188586ed9a1b44258f"
+   ],
+   "reveal": [
+    {
+     "by": "password",
+     "iv": "rRqR3BI6nHOHgL4t",
+     "ct": "eW57EPswQudOXKE87Tpr47M0N+otR6JkuhgIsOx6OQOw1/3UxDqeS7vHZmvP2LcRcenxxifI4le7qEAA7a2eIAGfDPtsL8GDRthUE7z6Qj/IG17gXw5foaqsu33vou/iVFdRmgChaXZLUGxooRSvNsFWeWsJzYwGqmDH3ICAteN5XBsmfqkmD+FoLIUrOZxYOgF6Z0slybfAw3gNLYRrrXNs/2wVCYct9dUMDu/SygZyZjPgEVyVdXTp1ec3zSwPVJdshfjqQkcCEfpYmGskwUDULLklGtvBceYlfbm49bylGv7JGbstMZbASRRx2SMQckm03S9P/OH92NlG2XEFsgRmRtG6Mf/0n3HBrghvwa1dZkSxRViJc006goiyV0tyjw5UtRnscjv1JRtntQT6rgrwuhOmAb66Yze75XVc+D2FfX1CyLueTOOi4NZZby5Bf1ZN5qo5aTM="
+    },
+    {
+     "by": "instructor",
+     "iv": "kI8S59DCzifbuxad",
+     "ct": "JxscjYTeoNsrtF4tQ+oH7KosLkQ4mCjJwYqc7wzhyo5oLpQlkMKuv8cff04eeNWTKbPMWQqW/kwg2iY5QLwM2gzxGs5x/zjviOj+2NSAYau84dH6WYp5b6xIM/bmYo10dMGHnxaQOjtLe2UR/KfYfjexfx+BSPcpWjOTlYUpTmoUih+VhrXgA+MKEq9ZKWqBdusoMmh9IYh+6dPaEL43Kj/nSoN0B2VzubdWyXBoTlSA4fhJty7h0hX2ZzbjZPVtq3NVqNEVaado+3WydbJuA86vkCT/yg2jX9f9eJdxCGv9r4YO9H6rH/pOkrberAUegXbZYGOokvQEKbKa+iGdJW4LFxXpMLpOqDjI3Ngb8zMwGDBo160354AIwNl1a+3/AfqkZinxHJgmRhgF0pW+5SXWpWPjN1Hn45ku6lKR9e9AFnb2cbLNyfM8klaieSobJRzE6ZkTAzI="
+    }
+   ]
+  },
+  {
+   "id": "upload",
+   "type": "text",
+   "prompt": "Once logged in, the attacker uploaded files through the Joomla admin pages. What was the name of the Windows executable they uploaded?",
+   "preset": {
+    "query": "sourcetype=stream:http http_method=POST part_filename=*"
+   },
+   "hints": [
+    {
+     "text": "part_filename holds the names of files in an upload form.",
+     "cost": 15
+    }
+   ],
+   "card": {
+    "label": "Uploaded executable",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "installation",
+     "attack": "T1105"
+    }
+   },
+   "accept": [
+    "85dad7b53f1107c1e98c4ccdb0e83a585fe84696594fcb4287c52c8ea0b92960"
+   ],
+   "reveal": [
+    {
+     "by": "upload",
+     "iv": "SLSjeTyfXd+80iab",
+     "ct": "CG4rLl2KTjSY8YhB/ma6uXwrlPc3csr17Y29mu8mWO5ymGaOon58c1sPHjCX7GZiuM/j+23a1LM9P3qYFUlfVNlx176gwxd++EtqYrrhtNqmQ2vmq/GSNALHeZZ4oImcItQFfmjCsfJPcLN9a16gjCUW50K/j2ARbB9iij/L6+AAEH/+tlU25yAF3mcCdZyJWb4D1Nl1Mhr0NwXc+ZTDN19StCAzR9wJhC/rJ0NTWGt8COpXDzrcwcl5SrFoEzI0ZYATSNo4gpw4iUXC82/enkeoDeYehkIJ3OVXyIvt6EeUnjd6NhVVrK15TWb0qUYiFv2dDk1i24hvT49ERE7QWeBNIXzumWD5izMdiGk8vJUfO0nk+LTmip0Ehp86dyLm"
+    },
+    {
+     "by": "instructor",
+     "iv": "YnXQRS0Sjhgm5OC4",
+     "ct": "N+Ae2+STo2OL51Sw8QPz2mJlG1Ispndrj14ZfgjGZKorF8josjYhuSTAKZRJMAcLDKuThCZWZPVR3RBvPXJBQL5C+CSmHv8Da221hsLHRW78koB29plRt39eiDW+BUsOC0pQGcSmkNQIBlzFgY+Y2I2sgPr+TVq/uMcJsI8QkBTPo3TaDgajQSekuDoufPKJYl00plQPNO5IldWxC6h+N0Nz8AHFy5/t+dZYwB0H09+9auVotkwGtqM02/F1Kwm11M3GM3jeQzhqwhDhlRzQYTEl5xOb0vNlzbKSgLgKVJGsgncCCAgi4iiyad1J92gXkEIk0sZcRGx7+aE3KGiHHEs91J3uAXRKRjxDaJTgOg4TEuikVUW7lKCw9cYcQMp9"
+    }
+   ]
+  },
+  {
+   "id": "md5",
+   "type": "text",
+   "prompt": "Open the XDR view for we1149srv and find the uploaded executable in the process tree. What is its MD5 hash?",
+   "preset": {
+    "xdr": "we1149srv"
+   },
+   "hints": [
+    {
+     "text": "Type the file name into the XDR filter box, then click the process.",
+     "cost": 15
+    }
+   ],
+   "card": {
+    "label": "Malware hash (MD5)",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "installation"
+    }
+   },
+   "accept": [
+    "87d83144ad45cc84407c88b05ffa483da9dca12777d06295fa14f80d28b55a40"
+   ],
+   "reveal": [
+    {
+     "by": "md5",
+     "iv": "3C3G/MItwSn/zO42",
+     "ct": "gqKMs61oUePnICOaVsWcVbzCuHIGAUtftZKMo8imgMbHPJEf65j1iGxRg2dOx84xS8F7trh1PFA6TaQ4dzwREPI/afZer7ST6PrJv0AS8NTF2yTPSqIQeQ4VjDl80YCzx/NGKt5DRmdTH83flkasGQPjRvHihyhHu4Sncp/Psv7ng22gOOyDofm+2w9AmGSFraZ++o2AigFQy9zXpNFtH6dg7moOgVwcWQTogZNE5xNUqIpw+4xfryjiYmX8Z4GK5hUpcTWfnmnXTI2IvxPOuF6kw8scCJleeVlUEdvyQcNJp9t9xpUBhfdF+N+quJuOMn+CU+vYK6GgUQNHQ1GkWRC+UOIWlBxFCvaZJdPSDx1sRTgsBFF4j9jrFavzgJZM7FUnxCXDmGy37M+OIvL3IJsNXxaeRTvhZpb7gbS18+nhxqa0ueYWb8pwbKPKN94M5yOe2c58y4ZA9C8oUFR1NEUf4PNO7TP3/V/GuoXL2pESseSVoTmTVS4Ewya9rIu/6uXCFI0fJGRgViqxCikADLJwQpXBZsWx6bppwNasm4+pyNY+6DPa1VU4suy1THRxMieR5T42kZaYgOyNv8XJxeX4Z8FDSinOIkRFudvzY+KQlh1E7I+16nFgkodaHbc1WeEOr+cNnLTb5E8h9c6xChz6d12ziXWrnNCBbJhoYMy/bKC2ahwW"
+    },
+    {
+     "by": "instructor",
+     "iv": "iE7vZAXLTLqBf2jl",
+     "ct": "rK5sppCTTjFA03N8nBiOT790PFLzGQNfgpJGOoYRzZpAjEzq9qakaCuLFWtc1/EZFhywLu0AM/1WhZEVBSnqPCJYQ+eRnsGNKU7KyW7Mn3DrSRSAxzUvHRHKFzk85aL0GkAaZHUKVF8Y9SlVdcCGNT6BARlHZisOBFbIfxrsutE+8GBMz2ycUA4rokr8mgmygCNOiFn4gqIkhWn2zLTvPvFrQc6VJrekZcmVgBamSHf7fM6dyzs8ye9Aiz80JzHSDd70rQcc59h9WmXl3+kHonvyBXWPlEr+4WYj8OLdB2/j4kFOWJULglyHcx9Igxx/Gpv0CPbRQzZTWN5EOrXEXWDPBGVfHD8lpgZFMnHXRLFvVn5pobOm2TBRMoR04tC0byHRszuVAyFNeDXwtlcoltPsxn8g7vSMQ87Kd6pcbjKeuYvgIQTG3Ab+wlGz+qmQ4TAVqmE7QDBrLW25CMxMcFRnKED8BzUzOdp3sn6axJtVJhMOiItAEoC2V+4erNyZ2JNPkmQ9Uu4Qs+yw/LvGcYccwGuRcJnVUrWaQboehb/4DhoovATDxRr8tpLPlkHcmnJqXkVN6rYAVG0pCrp33lUzBMEEVMLfDRX7eDfAUhlxPz5vQ0of7kwpyqa7b6SB9qsbDDVqYjacdqVczJlqvyC+ETE8YQ2VgvQsKcZzhoKEXqnWOeD3"
+    }
+   ]
+  },
+  {
+   "id": "deface_file",
+   "type": "text",
+   "prompt": "The web server itself downloaded the defacement image. What was the image's file name?",
+   "preset": {
+    "query": "sourcetype=stream:http src_ip=192.168.250.70"
+   },
+   "hints": [
+    {
+     "text": "These are requests the server made, not requests it received. Check uri_path.",
+     "cost": 15
+    }
+   ],
+   "card": {
+    "label": "Defacement image",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "actions",
+     "attack": "T1491.002"
+    }
+   },
+   "accept": [
+    "ca0388d5792882103fe7729c8b6fb71042b9cddee140595a45abee87831d2319",
+    "f8eee5733eb2f3d5548aee5f8a6673f8dd73554890cff1fef771f3a3d0727962"
+   ],
+   "reveal": [
+    {
+     "by": "deface_file",
+     "iv": "7/smqci/tGn1J3uH",
+     "ct": "FJ+Ol0ZO4r8t5chaGXne4i/eOfPx8XO1Tdw/1UT4AkJU2Uh8BJXe5i7t4yd9bOEjmZBo8Kbk/u3BNT9EGFhgMUbC0zOpXNbZXavNcXBT825An9hetZMwtyDEk2HQRBP7GE7UV0FT3E624nv7eUyluy0bPqTWiCTR1q05JOnoZTlmMRhQmYMr6Nj4bu6AgPYTrQ/paypggXSfilqAjvUa6Ngf3SBcWAralx07wkNW4FD2SoQtY7gRr/E2DsKa6vn3mWcvKaEfjdatft9jLei9swt9H1hFzP0M3qASYjVYLZYplMYUF/w71k0JzdhEi1B4+7apc/04FRB1uEkYjkkIJnWaBqsZESJM7sKg4Lr0txAWXDPnuTIveMPJUfmO7rXR/44itP3faaZ/RRa8FwRc5e53z7IYyg4ZSWzUS5b/wJVs"
+    },
+    {
+     "by": "deface_file",
+     "iv": "PhHbmUC1BQjjNMAI",
+     "ct": "yE4Xztpeq/xYecQgqX33/NrhtM0cKCugoX0rz4bAruoEE+YRQWHs2yISFyJVEUQYfFsE/tx1MiJh+qRKzXFRluLIdjhjcCC04w8GmKCmH9lxh0R1Sba5I8Lj9g4iyIcS68KrKSQ+5Sequ/4D96Yff4QMdBBwIXjgYqGvA7cAemKPqythFVtslXcilmh/g7DvK/KcVWykaGeRUhC47bqEo8rVZEo9UUd38i1k9dFt+buE0WFCWCYIGXdBC+rCwhwlD2d3eLnhMvg5ST9yww95uqLghKL2h7zatTGXSFqSdbcn+tBnX7bkmWMBwie0RNGjqenezkTzLNCjc94feSDaVS/EF2V8fNY8es3P0a6I+wC3GXYM1ElzJadBpJuSSr8qbvn+Dn8rPY61W4qaZTmtk4kB1fbQFDBBFPeD5K1GS07T"
+    },
+    {
+     "by": "instructor",
+     "iv": "hIrC9l+i8SGAXhqM",
+     "ct": "/TeqmT6l7ZDFGjjoPXTNFxpzR1NmnYzJV292vhHZnReszIKW/tLqjTd/oXuDffHpQo/OP+buXh77+CxoS8uSRQeGAHvJwhEyrKY74S2mwJSDqVPL2JytpZ95ZiBW4HW2sj7U5EBNpuLs7FjQa/kvmlJCnjxidQMX15j+6iw0CNAOj1LLZrKYlTPJGpLj6GjGWX8obZnVbQlyvxa34WTyhiO+hpFXLd0atgiZcc7YgDaWBi4xbqmxrs1b6NYGH+n95b/cLwOwT1xFPJf1pIrsWV0YhTvCgV8XnL0xMacTalWEEoBMTzDAu1s03ujvTqcE0IbkECdwYWTvFWk5yAf3pHQ7mKCyQnPPmcA1sPkbjUuIKfbG2G1DRLxl5DFH+fFKIQIUSm7aH9CUuJO2AI7keQqp2u2m5T3zHR0oqSKxUzFn"
+    }
+   ]
+  },
+  {
+   "id": "deface_fqdn",
+   "type": "text",
+   "prompt": "Which fully qualified domain name (FQDN) hosted that image?",
+   "preset": {
+    "query": "sourcetype=stream:http src_ip=192.168.250.70"
+   },
+   "hints": [
+    {
+     "text": "The site field holds the host name the server asked for.",
+     "cost": 15
+    }
+   ],
+   "card": {
+    "label": "Attacker domain",
+    "ref": {
+     "diamond": "infrastructure",
+     "killchain": "actions",
+     "attack": "T1583.001"
+    }
+   },
+   "accept": [
+    "686cac4c3d14d2d8fc82b195141ff55894bdd5b81444b0d18841fd4f2fe6ae0b",
+    "37907d55d2cbea756eb3630f8b13b630380c7d4c482a7edb38870dc46bc8e069"
+   ],
+   "reveal": [
+    {
+     "by": "deface_fqdn",
+     "iv": "vJxWoqtIrYvO3prX",
+     "ct": "Tst0JpukTP9mTa+8T6mRBzRteIoMm2309OefYpuOT2dq+0gdYkI4w74OeW2JFf+YxgrPeOK7Mv1kQzdEzd4QBRNhOtaT3j/TUNtp+3JmKQuO7kzye4rUxk8JomNlQCbDB2RxJU3s7x0aCJQ8GfLMqrQMLYK/FG7xHZ5IeEJE31VXjBjOZMFon/8JGaiQecnQewbPnU4UF9EkztA7Roh8FXMpUXBaqb4HxJQM/BqsV0PkL0GP5C3y6G2FDEBK9LLfAGj2JY7OqfpNaRYKZaRTGjYMVlacq3DgbaVk4/6mHPYD2iUjvPj4P8dpgZ6liFk8PXWWlOXR8ejPpfqjZNWp1Sk="
+    },
+    {
+     "by": "deface_fqdn",
+     "iv": "rCwjcyN/KEzu+IPe",
+     "ct": "eTgbm/SDs8WFGP3BditsZePwakMF0AvBW4mFg8ngIiO9M6BYtqcyIQtXmeUPjoZBH6nQEdKblkqJH1nILJK6+BkuI19rxq+zyFxbV0BL6MmIvGugLNWltoqawxNg1SaYGR0kg8fmnP8iPICeyMqtAECSZQQDeA4r3TbcCBGr5EGp+Z7QfA/ImTU7pZLh9X9s4HVqWyXq+wCESPXOUs6eFEi+O3nrMRtpWN8w/IuhZ1j1XUV30eMXw+2L6/meEnYyO4Uw250p9fX+ANPQP81nvFmV6sDdV30wmdDFT+tmYKhqazmhH3Y9u7ofjVoGZ8G9cFMvURtYrIo7mHpHHDbYx2k="
+    },
+    {
+     "by": "instructor",
+     "iv": "kb/D5KBVQvT8yMUJ",
+     "ct": "hc6O4gSBxYsRu6g67Pl00uKITZ0C1Fq6xPdhelOyyai/nCR8mY7dPeMN6DGcJ64b3g6uM56IZcgnDbDrXBgEyTNTeWdlHaSJ6i/NZyrtNIGgt0F4ICcEY1DwPlj177uHkyAq6J+kWiuaAE8cu9+TwlubG0635RI+Q5EIe0Dbfb3luivhTiFD21cRleV41AqjJwLwYfKVIlPSJ2Od3w3CBuWr3H0Lsywc9Mqoq0INfUcO8h2R0nCVG2RS+U8qEe1HXulQhgUQvxRD6ct5KZT+xpOSpXTy9Rkixz72kKnv3UFdEDeChb2b3vkEcugNanxNGlrLanOcgBbPP0iC82FkNWM="
+    }
+   ]
+  },
+  {
+   "id": "actor",
+   "type": "text",
+   "prompt": "The defacement image's file name claims credit. What name does the attacker use?",
+   "hints": [
+    {
+     "text": "Read the file name from the previous question again, up to the first hyphen.",
+     "cost": 15
+    }
+   ],
+   "card": {
+    "label": "Claimed attacker name",
+    "ref": {
+     "diamond": "adversary"
+    }
+   },
+   "accept": [
+    "7f97d444f02f5d4660eca649f33662ac220fd202fa08ed869626ec18fb60ab26",
+    "131f051352a95a9a35abc28d275e6d12e58daaf33d9e9721cee83c274e8b5ae9",
+    "c3a3f5b3a9c45787461d5778d32fec8f2ecb1ed77f5fbae0a1dc23cb52daf084",
+    "49ef25e88634d5a73c416ce03bdc532a646f614417006bad62acd93b3a9c20fc"
+   ],
+   "reveal": [
+    {
+     "by": "actor",
+     "iv": "T8LpEwZASnz1RonL",
+     "ct": "kcwKRPvurwd5vRERWU0c1o7LRmsXAlirgvCZpBlVeqfSYbqVyrzT72lGN6f8JrdaUxjTY/X5XXl2WhnxtYjGVhsf6iING+giWbC0t2MGjfK+97+qHY6CjTOUv9xwDnCQ8Jc2wqZbvOrlC+f28D/ntzNkEU/VGyy6YfoaZAJulRObr57NftqhFcTxm4xjqDnukJmAxi94tX9ikcJOaOki81zfZoK9YP1XUo84neuERZ7RaEBWT5cebb1GvGsEer/BFx0L7wcxE/IQwn0EmomtWN6fAblzhL9y9vt6S9wXPX3bOhpdhcN5yl/CmW36vaFWd8g0KOWMDeSMadNEinoc5Zlce67vAART1c7xomuNYa1uvWipiXvC7vv0wXTLPDzcUi91PhEDz901/DbjyyVA3BUKiizmemi1Pa/sPKFunrbYdKf7h8hTD+1oL9A5"
+    },
+    {
+     "by": "actor",
+     "iv": "rNBEsIRaoEQTVa1C",
+     "ct": "s94U1s9UyaLJaatCfu1Uai2EzFbfhP1Y5nDRMlbH5ySV7+qLXu8D0e4xdrJs7nTbxyEMJq4TYVDNM7dRHAzeT5ENX+OErzEJS+gqTzfVHxeOIO7g8wIf+Zj06BPF36835kTNwYhvjWHmUlhmxVaY0rQ9ReIl51Oy54BodJiLBeUCUpTlc8PoIw6bH6DITaVzlHxQsKnxDfq7T1pWRmS4eVzzaK2Ne/muVzrVJE1XDULiKxw/IzyopiGHGGz7OrdXx8XozFaAo0VuZnx8VR9yHQvVRpwYfm4UC9/Zmz6DIMLKhDbILsX3hxFfnx69Z2jUgdFNT8LmHlE8zERdw0H7n8lMFlPgpGbhs0nIg0YNUKMWJCGLrEHBmvViFJXfSiBZP/fKrYPf9OgmN/oneNshup4PGDrTiysNPsFa88xqamnXgfNXhxqYwGKAFwlw"
+    },
+    {
+     "by": "actor",
+     "iv": "Vrpcbz57x5XUXAR0",
+     "ct": "4X65N8sdGLkcBU/Hx0WS8Z1a5E+7xR4vnDarlBnAgnuJ2mLv5Od1KNDHB91CgPVcd12ArHlDhZF0dHl3hrud/1MQUieNuWXp1O3W3JVLtCKKWCsJowj2T6s5GCCsLbRkwWDdAExVqOuGGMx/fYv/p1v0V7+LohJVV9DFob/Mbwra9xJ1wcxuVIwrWhi0isbe47LMqGZJir8ZkfktdTm23wIpZ8s+MVdcXlFwNkjX6G7GOTwftzIOkZNSOpShaMr9uhONxWAOxV9WHk5nErqGYlby3gMWQGxMaP34HimtJcIaiYmAsYbB89sFhkbN4lsxsYNu1V5pJ+weYrWk0+3ADa+QkQBSlBAU5RMQdFKbC4egtU+S0hfSdpi/9dHoot98Z/Vk6hzgLHl4BMEV8tggtoS9xfN3OQrOdaP8E4DV78iaV9RURwmPRA/4TUY2"
+    },
+    {
+     "by": "actor",
+     "iv": "/+73Dlfa78Ybv8eu",
+     "ct": "bKRlFUPAcifuoPUCY045Qizb30LBGrUNA+rIXxhPcYj+PubuyGx2YQWPJ9pXrCgzC5CLT9M6vaFfJNgMfOZiwI01iEEHAcLOZG7pa71Y1LAYh31p+bKhTRDAsXSqa9rycqFstVogRvMPdvFr4SYjezpXk3D6WAv2P4I311Gs3/4DqCjfAQppRtLj7mNHRcrB4/3eKq7PRMeKTynqd0igml0rJd6jdwPANlQFQfnCcVSzpzBUSstKbhPq/KBU4gQ31pZWgKoagiW2jjbS9nx/fktcdjsC3OwuaRySW3bLvNIwhXfZCnShak8NKfJoV4YO8Sd22MAm+tDbi5QFSRBIY5r/aqlI5sKt69lOiZDWdoKh03DxS5kYTW2s5KapNHDxwF7qbwg4KaWf3f2Uo7w2mVnVioS7vIyL54LlQoaSKVuJ/wRkcxk6mq8OfNIX"
+    },
+    {
+     "by": "instructor",
+     "iv": "Z0mJc3ysMswjTYXy",
+     "ct": "cSD5CgO/Cuf7nOtjb5ZPF4jEmS6QZRI55E2C61R/i3TNardh9IxbICsVjHuBQFwhdjxnKcN24IGaj54OT6JeN/TCxPGy0GIS/oY6UNk5IUHHTs0OAgBx5fUisZMmuBiHAhuf22bCc3vlJ+OZjjqsXNGr56w0x9cZIw5fpmIjmvHb05M5Djg2jraijvZMaIsZEXfI1Zm0Kc6h2CfFsKtTeORT6pvOrAMZjTHdSi1b7IO0B113k8n/Vw4sXvmAxE9qMqE5skTboQ77MEC4kfgbh7+qFuywneCorL3dtgzi9uhuQJCHAdAtrH57QF/SK6DbaJThyEeRmQM4DvDz9NgOb2AUYEKvSeqgPDaXPPJ+vyXSWOryP3crhgfR8RKe2MHMSG7PZn2KSgxgubTHhmioyaw4MtdhGgyUhBFEz/dIcZBWfN3Vp2hAmtr44eTv"
+    }
+   ]
+  },
+  {
+   "id": "contain",
+   "type": "decision",
+   "prompt": "It's 22:25 UTC. What do you recommend?",
+   "context": "What you know: the attacker has the admin password, a web shell and an uploaded program are on the server, that program connects out to the attacker, and the public site shows the attacker's image. The CFO wants the site back tonight; marketing is fielding calls.",
+   "options": [
+    {
+     "id": "rebuild",
+     "text": "Take the server offline now, keep a disk image, rebuild from a clean backup, patch Joomla and change every credential before it goes back online.",
+     "feedback": "This is the safest option for integrity, because nothing the attacker touched comes back. It costs hours or days of downtime and needs a backup you trust from before 21:45. If the backup has the same weak password and the same unpatched Joomla, you rebuild the same hole. The CFO will ask why one picture costs a day of sales."
+    },
+    {
+     "id": "cleanup",
+     "text": "Keep the site up: block both attacking IP addresses at the firewall, delete the web shell and the program, reset the admin password and add a second factor.",
+     "feedback": "This is fast and cheap, and it removes everything you've found. The risk is what you haven't found. An attacker with a web shell for half an hour may have left other files or accounts, and blocking two IP addresses is easy to get around. You're betting your search was complete."
+    },
+    {
+     "id": "isolate",
+     "text": "Replace the site with a static maintenance page, cut the server off from the internet, capture memory and disk, and decide between clean-up and rebuild once you know the scope.",
+     "feedback": "This balances evidence against business needs: the defacement stops being public, and you keep what you need to learn what else happened and to support an insurance or legal claim. It takes the most staff time and leaves the decision open longest, which the CFO may hear as 'we don't know'."
+    },
+    {
+     "id": "watch",
+     "text": "Leave everything running for 24 hours and watch the attacker, to learn their goals and find anything else they've touched.",
+     "feedback": "Watching is sometimes right, when you need to see a whole operation before tipping the attacker off. Here the attack is already public. Customers see the defacement every minute it stays up, and the attacker can run commands on a server that may reach internal systems. You'd need explicit sign-off from the CFO and legal."
+    }
+   ]
+  }
+ ],
+ "debrief": {
+  "chain": [
+   {
+    "time": "21:36",
+    "phase": "recon",
+    "attack": [
+     "T1595.002"
+    ],
+    "by": "scanner_tool",
+    "locks": [
+     {
+      "by": "scanner_tool",
+      "iv": "ONdYwReMfJoQwnZp",
+      "ct": "OXQ49DSyR6oq29r6QgxQrIAr4Ugwi9oXRb1a1EIahL7eEvkMTO+1Q2RcW3ciko/jmHOsQkx2DxkU+2mqTtUNLqT5s+dL+ACF1U2uLuUmudgTONvvNHDf99xw8QyjVctbpxkm7J2Mhmw4Bqioq3iLR1g3w5HOSPFCP/FribFKn7JF9e9r9HPB"
+     },
+     {
+      "by": "scanner_tool",
+      "iv": "KJlpmCqrJ8jVAHIA",
+      "ct": "2scKpdCLqf5VhMHyl8S6K3lP78WoG9cKUwLG3+xUKa3/3vWVgXvxALI9+1VpqXUN0IFVr4XCPBWLNJfLmy3BZEFgIUbQvbGZ0HNH9UA1ZLiOzFLzmIiUz24jF4I9q+vrPl6RBsEF3pNnapwNmBigyR32OgNj+ma0SbmDZH2sQ3RT7KUdIMs2"
+     },
+     {
+      "by": "scanner_tool",
+      "iv": "f9ucCxCd+RAWT8GA",
+      "ct": "6QrbnpBBSvQ1WW1/iWv311ZmeY8nwZeFyURTixFdB0s74HjlpgT9YvlymeOAVtEaVYH8SdQXVNHMcxWC+jtIeN3bKfFIq+7R8ZedSkCiKMSFBsUwzNv8LIDa78OOt+3tByE0Hde6WVNKsYM7PMJM5c5ult1nGSZ8x/O3hz9Ud28nI+qdLxmV"
+     },
+     {
+      "by": "scanner_tool",
+      "iv": "us7BT39ziRySiSsX",
+      "ct": "UKiTmUoW5HvKeuIRN6SgnpTAZEVksYOdzKlujvpprBfmAn7TOLkAL1UFADidJFWs9KTzYxGOkZkTGmfQW3iV+PLgAoXe6wHi2NYt4OLQVZvy+ZPeDpqgz5fVbLRMKIqJeEqkkXUNpqk9pzkmYFFFsmOZYqjUdx7O3U2MPJDfzawosFG4o49V"
+     },
+     {
+      "by": "scanner_tool",
+      "iv": "Ap2AigKacRnWIQww",
+      "ct": "LZOyVjMjdm/EkbLRDfrfXCGQzN8szbvu3tbgAsPMTgurjLyErMRq2IRS7Tih24XMrTCQTAAOZWzHrRTfHDl29VL2pHL/8Uy8hPVwaYN8QkKlvV3bYPMd4gWHzgAdurTIqfIh43ujPmMjW+ZoaPiuj6q4sfzIbSDL2ecoI5ep6xqTzUgjybTS"
+     },
+     {
+      "by": "instructor",
+      "iv": "UJYDbHvD1E5x/toE",
+      "ct": "s2g/OLfeHkGhvH05aSgcqaltp21Rd++2z37P6njO7Frit1g6sO+8u7AfBYkDoDxG4pwQETrJEJxdH1JBUaFMBLi7tduamJdIa7uzIu7zlYLYxWoNW1EmmJn61+T33RUvQYaA79TFxVyu6FsiWaqvW0BpqUW1KTst2bm/dHWKnHxYBqMG/5Oo"
+     }
+    ]
+   },
+   {
+    "time": "21:45",
+    "phase": "exploitation",
+    "attack": [
+     "T1110.001"
+    ],
+    "by": "brute_ip",
+    "locks": [
+     {
+      "by": "brute_ip",
+      "iv": "7mrdJGoJmAKEPd1A",
+      "ct": "EqfCMjhlWYqanDz6v+dvYsC0D6qc7cx7JjAZ6nmNSwGLvGCLJlOdTk7MdAQxb7hybD1kZ/XJ8J3scOZrUD1B45PkwsuoXOYBHV0wEpgIWY3ip731wcgubynBqNxhN+wXdM7JY1mUgsHJmfWimjwpJcUZZnhAU1IPeEYZyMP1crPKbYk4hQ=="
+     },
+     {
+      "by": "instructor",
+      "iv": "UA8SbI/DKyMTukYQ",
+      "ct": "YdPnr+j2XyDJGT2SgDVuvl1OoZ37SGYfquU6nyk5UDC778QAULtBY+Wsbx3BHsvjLquWmi1Rs5mzc7gcMbZ6pFoYZk+oDSCjJVqPfAUq4HuY1WtB18Dtk0NC+HWe3vgJ6eXnxBKWJ9u2iMCQ2cqdQYp1J/cRP/aDLPAuhJMfOTWRLj+NMg=="
+     }
+    ]
+   },
+   {
+    "time": "21:46",
+    "phase": "exploitation",
+    "attack": [
+     "T1078"
+    ],
+    "by": "password",
+    "locks": [
+     {
+      "by": "password",
+      "iv": "+RiMkjlug5YYjbfe",
+      "ct": "JZ7TTrr3U5/c3qWJOjgM0TD51d0K2BE8X/MeDBFlmiqUtPeawodgv/szpSAwvL8+zgcMuhPk5TJzBndYtbntAIDA"
+     },
+     {
+      "by": "instructor",
+      "iv": "hKJPox5Re/WYMXan",
+      "ct": "7uZHDoWfzSBt/1VDH2Ew0w2L7JhiCrBpMogZouV/0WzarbDzx6kJ7FGIGP3bz0pFYhrdc1hkyV396K9XGTLSTwt4"
+     }
+    ]
+   },
+   {
+    "time": "21:48",
+    "phase": "exploitation",
+    "attack": [
+     "T1078"
+    ],
+    "by": "password",
+    "locks": [
+     {
+      "by": "password",
+      "iv": "Td0twCswHuxRxbzY",
+      "ct": "9+Ff24+b3bVWh29jfoJLz3TDS3jnH2jWIT4OFd9z36yKNRNM6EMwWQ6r1OX7rp15gTBAO3MV6HChEaFOA5f5LfqeW63wX4wloXqQF9iOAoO6k190O4esEXtnv5U3gheeLIP4AiFtI7Al1vGUcKBsF1ZLxFh7FN9MZg=="
+     },
+     {
+      "by": "instructor",
+      "iv": "OJR4ayhY9ei+Fxi1",
+      "ct": "AEdr/GTycnMsAVjJnjQTg5MnAWXkW7Y+EzzYAHJFJ0D8UmYrSR6kV6wbvUZ4nQIbMRnaYVoJJt+S1FtXiA5P2dDeIX9p6oqR5etPCk7d0E8hgc99nTX2LNO2KAwRvps8Y5yCvmBpq8bhIOrI2tV8IRyYqll8UFAhKA=="
+     }
+    ]
+   },
+   {
+    "time": "21:52",
+    "phase": "installation",
+    "attack": [
+     "T1105",
+     "T1505.003"
+    ],
+    "by": "upload",
+    "locks": [
+     {
+      "by": "upload",
+      "iv": "hGg8mSatAD6bpAQB",
+      "ct": "N76Zub5wwhQkasu7lqu4r77/T8uJTYB5xxb4ijbgF1tzrW7ys8bUvf1vOyrGvjdHJRQL0buLfyrpztVcXOiQWu3npbR3viKkDJHsy669EOx2MEaj8By++434F23cpM1WNXHoEqPCcIYgzOmSkHrD1dHi83lCMGQfr4GifbD0koYE"
+     },
+     {
+      "by": "instructor",
+      "iv": "3MM04qWLB2GP057+",
+      "ct": "uGB6JChFtPyR96yi/AdD3MjqwBYk2khYlRadpMni2iWVe8oVRY3xyxFycx3RIFKuhA7jwFCKhLBGoQRPyZ3ZQ2kVwttI37koofvqZbvCm+2jySvBoAlLR5DOaurlE7HkIn5TKZuHP6zBjcaQzkZIdDrd89njrlNY9kc82Nndt9Ix"
+     }
+    ]
+   },
+   {
+    "time": "21:55",
+    "phase": "installation",
+    "attack": [
+     "T1505.003"
+    ],
+    "by": "upload",
+    "locks": [
+     {
+      "by": "upload",
+      "iv": "6NfsnTF7LfiM5mku",
+      "ct": "BKxvkNb3A4HxgM9Sns5CQGNQC1sLjkMRAXL6zRtNuj5gbFqa+a5/gCvqzVLOB7Au/FqFZ353SGkQLLm6kjthu8ApwHG00JsczS176c9dyWDsyVOC+1eSJHQLdbYoC8lUBZmrFhRgoLWTCVnBtGsPLRHK"
+     },
+     {
+      "by": "instructor",
+      "iv": "Jb9Wtfg0mn9UgqTL",
+      "ct": "iu6L8Oe3/lkwjMKoS7ycaiYmYgH1Yei4W6lic6OBExtubTvAKbXWXVo/bk+URwVei8rNlUNdqU06LidaizQE/ME/c6dHMX1HjLU/kCJkjGMOmDKKKmrwv2D0JAfhJu3tZeg05foBflZOYyUyof0lJiyX"
+     }
+    ]
+   },
+   {
+    "time": "21:56",
+    "phase": "c2",
+    "attack": [
+     "T1059.003",
+     "T1571"
+    ],
+    "by": "md5",
+    "locks": [
+     {
+      "by": "md5",
+      "iv": "4rVaVdjG0S9dzNMi",
+      "ct": "r6+RxxL4mp9+DZQoHYJhg7Vfw2sxVD7cI392T6yvx2W5ZVKEZvFdPC1f3CTxPfHrMICMRBWMaHJzaf8F5+L/QdzV8XVQ0zgT1BwHZJPdr8WkdVVCW0E7gyc/Fey+yBkFSDMtDXRkNTWa1utFIhreqx9vrRYjO1s2+VYR8jDMwG6bswxsxJjMPyQ4Ravi8NQ9SvY3yAEsvyPbI1o+rTbsgs6umwuQWw=="
+     },
+     {
+      "by": "instructor",
+      "iv": "1PrNe6VeBCRsVpTW",
+      "ct": "fNq8iC4pmy1LumCR7n6adronExQaf7xQVQrrqKPYAWVUAMn2vVVsc32D1i+wEXjpzu16j6AeN0TMY5/Ou40c3ERxbyabozD53WmfV6f948HnFqsDOs85WWRseb1ybAOr8xGFNKJFqTweDsrojyq6Z9XP09IwvKpM+dDrRsGDuPlFgjGTSEwdds4eQLCstvLi0I6+Y7yv8jU5uYfzSi+JxE+U+6WNmw=="
+     }
+    ]
+   },
+   {
+    "time": "22:06",
+    "phase": "actions",
+    "attack": [
+     "T1491.002"
+    ],
+    "by": "deface_file",
+    "locks": [
+     {
+      "by": "deface_file",
+      "iv": "1ZrWEepNptGC8MGe",
+      "ct": "fuqlFcID4DIb1dOytkas9EnaBiX0uTMKn0myxJ/GzclBDm8LEwnVe6XoQ44ujy1K7s2gMcNJ/p5cfprg3BU82mqYYuplX2sz9uViJyjhgYxkJuY2/wMkWzWb0Mt02vGsQ0w3ziMDkGxWMpag++nDZ9R7zv7XZjQ67dQ1WYuljoj/p0lD+0Ib3kZlPwDomGaNJaRJbjmCwN4tHik9Sta2GQ=="
+     },
+     {
+      "by": "deface_file",
+      "iv": "ng/U6RbnrOc88TLG",
+      "ct": "QwhI/TWlM9sA8RWFnAteSMjk4+QMJ80EIL5eDwU0LTEY02arMMVIuGxlS3amLGbKFYsfInuLrCjyPIKNtYvwXNUA2w6vcbBPuhBR78X+wHpsTgwIko7elxYFLTQR9lpQySxqJxuULJ0V2GcTpJ3Wfhwzwrb23uPZmOgMHHz2KuCOYDrHIb0RunnQJ5HW+x76tMZluqkomDcHfYEZOMpmSg=="
+     },
+     {
+      "by": "instructor",
+      "iv": "9JwXqvV+OCGjqfV7",
+      "ct": "6r41iZ4JpcBdSbu2OAoLU+LT00WswA8qYzxsJxWlPCjFqk8/9fvhYbn1MHj/ULfh/3SmVvb2nF5JOHvNvfiIGVcQi3Ct/IbkQNZL6R5rUk3RrandPR1tUkMTON2LluLezVQ8ZM6X0F/o7rzaHvbA4BGDc90vEt0p4ZYyDOZJKYxGbrFsRSR1g3zSzdWi24WDcEQkeY4T/T/KSun2b2l9yw=="
+     }
+    ]
+   }
+  ],
+  "cfo": "CFO pushback to prepare for: \"Why can't we just put the old homepage back and block that address? It's a picture.\"",
+  "connections": [
+   {
+    "session": "S12",
+    "text": "Valid accounts and least privilege. One guessable admin password, with no lockout and no second factor, turned a scan into full control of the site."
+   },
+   {
+    "session": "S13",
+    "text": "Hashes. The MD5 of the uploaded program identifies it whatever it's named, and it's how defenders share indicators."
+   },
+   {
+    "session": "S14",
+    "text": "Hardening and patching. The CMS admin page was open to the whole internet, the web account could run uploaded programs, and the server could browse out. Logging is the only reason any of this can be reconstructed."
+   },
+   {
+    "session": "Threat actors",
+    "text": "This adversary named themselves and wanted to be seen. Compare the ransomware scenario, where nobody signs the work."
+   }
+  ]
+ },
+ "instructor_check": {
+  "by": "instructor",
+  "iv": "Nt+yLVEpC2tooF4F",
+  "ct": "603KMjspIgI2KIUFW0HijFG7"
+ }
+}

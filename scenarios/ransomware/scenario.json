@@ -1,0 +1,739 @@
+{
+ "id": "ransomware",
+ "title": "Ransomware outbreak",
+ "mode": "open",
+ "salt": "32e09257426d6234",
+ "brief": [
+  "24 August 2016. At about 17:15 UTC a user calls the help desk: a ransom note has appeared on their desktop, and files on the shared drive won't open.",
+  "You have the logs from 16:25 to 17:35: endpoint telemetry (Sysmon, WinRegistry), network captures (stream:*), the intrusion detection system (suricata) and the firewall (fgt_utm). This time there are no pointers to the right data. Answer the questions in any order. Hints cost more than in the guided scenario.",
+  "The Intel tab has the company's asset list: use it to turn IP addresses into machines. All times are UTC."
+ ],
+ "scoring": {
+  "question": 100,
+  "wrong": 5,
+  "min_fraction": 0.25,
+  "decision": 50,
+  "board": 10
+ },
+ "techniques": [
+  {
+   "id": "T1566.001",
+   "name": "Phishing: Spearphishing Attachment"
+  },
+  {
+   "id": "T1091",
+   "name": "Replication Through Removable Media"
+  },
+  {
+   "id": "T1204.002",
+   "name": "User Execution: Malicious File"
+  },
+  {
+   "id": "T1059.005",
+   "name": "Command and Scripting Interpreter: Visual Basic"
+  },
+  {
+   "id": "T1105",
+   "name": "Ingress Tool Transfer"
+  },
+  {
+   "id": "T1036",
+   "name": "Masquerading"
+  },
+  {
+   "id": "T1016",
+   "name": "System Network Configuration Discovery"
+  },
+  {
+   "id": "T1095",
+   "name": "Non-Application Layer Protocol"
+  },
+  {
+   "id": "T1021.002",
+   "name": "Remote Services: SMB/Windows Admin Shares"
+  },
+  {
+   "id": "T1486",
+   "name": "Data Encrypted for Impact"
+  }
+ ],
+ "questions": [
+  {
+   "id": "host",
+   "type": "text",
+   "prompt": "What is the hostname of the first computer to show signs of ransomware?",
+   "hints": [
+    {
+     "text": "The IDS has signatures that name malware families. Search sourcetype=suricata and look at alert.signature.",
+     "cost": 25
+    },
+    {
+     "text": "Those alerts come from an internal IP address. Sysmon network events (EventID=3) record SourceIp, and every event has a host field.",
+     "cost": 25
+    }
+   ],
+   "card": {
+    "label": "First infected host",
+    "ref": {
+     "diamond": "victim"
+    }
+   },
+   "accept": [
+    "48b3776c2d5c57327936d8313f867fde232783739f6ee75c7f3794705dce90ea",
+    "a2be467b13d26a6c9e3369a374e09112559bbffe142079c2dc0fee843e08103c"
+   ],
+   "reveal": [
+    {
+     "by": "host",
+     "iv": "9D96EP2NjEO+0gFz",
+     "ct": "ItHz8E3dD7YPKOQ/WUBoYrsWKmXYrfXb/tdu0zMSlu2Jjei5EhCqxMxxNMsa96H9FIfJP/WRPIkKiTqDrEEZiLXS6xayP8h83mbVk9a54+a2XI7j7UtsUKO8jWQtDo698hYyL+Vufrkv3DXlK38nCTjVLKjd3MXtw+vhpDr7yE6Shn0iWqpuuAt76Yta5MCZrz6IRdDVNqYsMXYI9fjJYgdKPY6K+YxsGfhrjLmbjwXSIhIcSYdIri45XQQWc5bP3/6YKKJZdWSe"
+    },
+    {
+     "by": "host",
+     "iv": "6Shy8o97l3FbUpn4",
+     "ct": "uDhbC5BHEweCxlAyUGx/4M/f1gAcWlttutSagOf3IzhyckrB4bhV769ozL+vUXT/LjArijlgpVjrhHMNhydg2ZjyelHZOffSAiMCEJfvwOOqupJM7YJOqZ0uFaGioNnNR8s3GsI0ye0FqOsVgUK0k3yA8AFH+94BTw5vORKsffoKD+mDjO/ro8PwNux0SqK+Ed2E+G86k1AXa3E4rCzCYMW6DcutB9Y4VHdyhN1v1+7obP4TMiPBm9nNCWXWNlT1zRBmCLIvHHFj"
+    },
+    {
+     "by": "instructor",
+     "iv": "SOkkyyupmwVEVp/t",
+     "ct": "LCS+Pd3DC6nQIOZ609/xPMCFpClcJYi8GwBzObqkpLH1lPRz+ZwUeJ85q1VIWLWQ49HKBCAaq4aDUAOoSdSCvQOpbLy5KiRsPr2x5E84iFo01dL79ml/yZ8113MOyuAIIWW6vsAIjVRpcsy3Oict9+zL39JRakphKHVHtahc3pbb4IFpe3y3y3YBwaZz6ab9jSn93g9h8sfmwTp3LbUfdpfTwogf29rLYSvIbBU96/jdIZw7ZUorGcut2wn8gos7xXvAmgP1VuXB"
+    }
+   ]
+  },
+  {
+   "id": "family",
+   "type": "text",
+   "prompt": "Which ransomware family is it?",
+   "hints": [
+    {
+     "text": "Both the IDS (alert.signature) and the firewall (msg) name it.",
+     "cost": 25
+    }
+   ],
+   "card": {
+    "label": "Malware family",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "actions",
+     "attack": "T1486"
+    }
+   },
+   "accept": [
+    "5ea165b14e048cfcaaeb3d38bffff0ca1f03005c497eadd018cb5f747057a5f3",
+    "f9e5a8954c8479166e301247fd7d75e6fc91887ba49a0bac6a2097c92af32114"
+   ],
+   "reveal": [
+    {
+     "by": "family",
+     "iv": "gwvtMGXdxii6zd6e",
+     "ct": "E5TQNrUJo/dsKpq5d/8fJXXHxQQmnpK9ko8G/BqWTNRut6lWJTIT+vWPwrU67XdgOYBLB6ltLPPa8w4g6zRjAuaGwCdY/wxWdJ38hOBy7KflrpO9E5b+aDjjBj6gbzMXMoViefn48nQkdvQwTVloIfdV83cdICjYbTbtZ18w5eJG7LPWgh/fhtXxjo86vXNGD6RHb0MuOleH9BdeD9rdmvl8iPYuNjyJ22Lr2giIQrkjXl84QiEERUHxyhYGTgzYKRZ5HjpyAnVhEocw6Ep0KrPxJvYhHrYOCNPpFiez+NKeoHrO/k0HGIbd4+Sq9mB3epg/QQMT+fGP/V3AzyNmVSbvjPgaN9fw6KDsq/rlRyDBxIHBtHXSyhrSw4tj3lSMaxeUNlxeqLUYem8qfQQOVWuLIlQ="
+    },
+    {
+     "by": "family",
+     "iv": "8qNciHWYRDhEU7Xu",
+     "ct": "P0fZDD0EslC9wbDOB7tl9KINOTD88P3lzv4IBzPcxbMO+DCkbyY3O8WhsVpRLh0oPLZoITm4uIeLIdLvnWpn7PztMLiTH5TV5iU59w80I8p+HrVEjrehmjy8KQtGYMR+zEHB3YvrPjihZB96iANj7hNkkOmDIwUlMbc11j6VfAiOnPV3gz2YZ2rrxRXYk11VqL5yNLRpVky735P1S3nY0FphNOZAldd2zvkdJ1Glx8e69dB0L0sVmekdW5CAId3dFzA2xukGlH0jpcIAu7egDHoY/ePFtjyJTQAoUtRwNSv3d8oJS0+o/xoHwLE5MbxXxQ1QXsER8lzuEXx0Dd9q6OvcxlV6Cxlbeji0t0yZNECNvD4bfcineO587AhY6tiZLAQBECFL8Pwizt9QY79QiqWZliM="
+    },
+    {
+     "by": "instructor",
+     "iv": "PaDghZeelPbVg5UJ",
+     "ct": "v27GwNnV7poaHOz5aHN4wk2d+VVk2jmMG5KQ+n9TqWsOv2PecxtytK77cj02gQ0BgSLtzsq6jtepR+dI9N8KNT13N+6gd/87ff9EsVWpFlOZlBtxU8uPGDpotfT42emgunx+EwXglT9Llo7anh641xOAoBUGIQZ3RGtEIkuoqlknBMNq9OML+XJBdkGTYuzgagU0RRemfreEiZOZ9A9rxgWsC9fkoNCrQTBZ9fNCtPvRGobMBpcZh5ZKtnk8AsD2uHDFeGgYbbcUcfPZPc+tlpF9spZVnWccHmRXEv7mgd+TcwrQXyF7oJl7kTGLY3J65Rkmt7Vkr4/QrRXw9iCLjcOuT7FlaMAGfENp9PpzYKGl8CBABMVg5RZABFjQJgFfp7v86CqbYimt/kFCv9MDfBN+Q1k="
+    }
+   ]
+  },
+  {
+   "id": "usb",
+   "type": "text",
+   "prompt": "A USB stick was plugged into that desktop shortly before the infection. What is its friendly name?",
+   "hints": [
+    {
+     "text": "USB storage devices are recorded in the registry. Try sourcetype=WinRegistry.",
+     "cost": 25
+    },
+    {
+     "text": "Look for key_path values containing usbstor and friendlyname.",
+     "cost": 25
+    }
+   ],
+   "card": {
+    "label": "Removable media",
+    "ref": {
+     "diamond": "infrastructure",
+     "killchain": "delivery",
+     "attack": "T1091"
+    }
+   },
+   "accept": [
+    "8683443b0b9032cba25f5a4f5291bc0a0120f24baecf3a79e5295873cd6f2de4"
+   ],
+   "reveal": [
+    {
+     "by": "usb",
+     "iv": "W82+mji7OnDGQ5Xi",
+     "ct": "/RCVNpMC/QrHJPSYs29KMoApsqc1Yn3zhp3jJlmmjiR/eH1Vpkez5bNQsbNAlrq1L0K2wsrLNvQmM0k3+bHD4y9gCq9WkA+8ruaD1HKvu8qHIsfm8s/14/7iyvx23VYiwU3aR8NpxxQE2fqRa55cy0etIWm4+hu48LkatvINrfTnEMRC5pMP5uEki3QFVkCrWVVsGN3FIU0E6fahLioQORk8EkR+UAPQCjbOshYbEp04WGLTYtQ6clCyBwkLDdpQ"
+    },
+    {
+     "by": "instructor",
+     "iv": "Mx+mzL750h0bB7Zl",
+     "ct": "oEEnO32sccW9LPzY+vlfflymOGYpfHmkEc6cM3PTuuXtkKyCLVDjvEWbZ4HtkrsmmGKFH1+BgYzZ12iw/iLsY9zE0soUCMD7W+/i7wb1rP+ohkbAkdWdL9ltw6y6keyuZphLCUyvhBxgqKBK1RP0/9waOTIY6fYoqVG1tPsa85xEjBI2DQmhQHY+Np9oZPkwqjh/EerSE2zwNEWzeySaP54d6SNyDP9jnfsDlhLC8SWZWzFmovTYplMyl8wUUCUn"
+    }
+   ]
+  },
+  {
+   "id": "doc",
+   "type": "text",
+   "prompt": "Which file did the user open from the USB stick?",
+   "hints": [
+    {
+     "text": "In the XDR view, look for WINWORD.EXE and read its command line.",
+     "cost": 30
+    },
+    {
+     "text": "USB sticks usually get a drive letter such as D:.",
+     "cost": 20
+    }
+   ],
+   "card": {
+    "label": "Malicious document",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "exploitation",
+     "attack": "T1204.002"
+    }
+   },
+   "accept": [
+    "1359279bcc3a4ddbe21fac46d267b9d2ac94df7c0621c362fca1c978f01184ea",
+    "400fbcdb4a0497a93ddd17349938b14b39e83437d1a107157c06a77b69b04fe5"
+   ],
+   "reveal": [
+    {
+     "by": "doc",
+     "iv": "jHCt6sCMIPbGLnrp",
+     "ct": "+rBOdWwvpA7UXX+6auNO3SU56I8rkNep7oWuwgwJq6J858d8Rr2vGBT3QpPZO4RUuTRQWhq1P7eN5VtM48VfpBeXOx46CO1ZszFA2vovvksF3MeYCH6RASyHg8PRi3+Qcoe7s025meabc6FFCqesgGN90FQP62DGzyktotXax6PHuVPCwgm5juCf4uorfj/CgUdWvXT6I9pKqg9SzLrg0QiyX4YoZIRyyBkEVyvv7Rrelem6AKDt9rjcpD4AUh3VG6phhGi1AQYGPJimk3dPUAfVlsJnCmaRTTNX4i994+JKeE1FjXz7rA1kBWmb6VsSp6jhaEfO65vzrCf/4g=="
+    },
+    {
+     "by": "doc",
+     "iv": "BDhilllwGY9VBgml",
+     "ct": "+dLZoGIJ8IueGr+Ez/GSWMvr/5/71WPhJZAiuj18gnc47MIwYfhr3Oj+LehD7v7Aw0RBISyDgjcF1czhVwYVzZRVHuIYL8hntJHHqhcf42IOE1n11lGS0VeO7YoTB4rl02fdl23H+BmIhTFShQlobNvzGHusqoFjzo/0m9VGvQ3Ta0SqMz4D5atpuq6eULxif0TMeKw4aEJKVzDVhraLhGZKHFJ6qk5l3tF9HIVY2E4b2NJtVVg9XBGFbzHRwWOHL+J2rcRTrOapeGLoOMnEI770ZlDbIyhozJlf0hMXxE7JaTgym8RCItCJ3b5xudUdNg6xZk/+7CVKSard5w=="
+    },
+    {
+     "by": "instructor",
+     "iv": "4pgn4cMO0G6gOR5E",
+     "ct": "L38qGc9WB3iN30tmFrv/jPqf7qAUymd59lsYX+dgzms3e4UkWUwcLqudxcdXQgbxOp1yIJ1+zEG0rkc2EJbuOIOZgvf+kYl70F9l01UXu9FJt3s+Tt7j7sqbvCMa511e1Z0HpB4+WOSTS7NY3GW+Nnh/2HN7eGhfG1VbLEpexoSAuzgM3F9kLAT7ZjTFAZCH0BSFq2G0xXiHEr4sC8D0WgbTbLyoM2uu1IQwWhLTBv1aXhzOwQxHoiMb4HikwRK7BJLPLMsOJz3+IaV80yhSzStdpzAQzMKFQtWILX4nNT7JnscITomnMGG+J4dU5VKjtcLbiSKJnSgMoEWI9g=="
+    }
+   ]
+  },
+  {
+   "id": "script",
+   "type": "text",
+   "prompt": "The document's macro wrote a script to disk and ran it. What was the script's file name?",
+   "hints": [
+    {
+     "text": "In the XDR tree, follow the children of WINWORD.EXE.",
+     "cost": 30
+    },
+    {
+     "text": "Windows runs .vbs scripts with wscript.exe.",
+     "cost": 20
+    }
+   ],
+   "card": {
+    "label": "Dropper script",
+    "ref": {
+     "diamond": "capability",
+     "killchain": "installation",
+     "attack": "T1059.005"
+    }
+   },
+   "accept": [
+    "9fb15e7431a945014b3a0e9ddb1825c4df4077df30b53e1412156c82196c1e34",
+    "acbaec8d5d287aab1677d2563dab4244b160e6b1290784585003542c08243b0a"
+   ],
+   "reveal": [
+    {
+     "by": "script",
+     "iv": "U2fAPKC62koOYUpY",
+     "ct": "UPaqE4MDaYS11LPoP8hZD4luO4ZK/QdEsjrTWy8D83PYk4cp/Fk8OARvzYcjB0Zc1AY29lxkzIp+BwPxhHQ4DrwrcQPBm3NVPmfp7m1HRm+PBFs+3ePeAVTzPQJSkxcDzvrGWy5xsB3IQqk5Ds7iXXWzcW9LWaunRGMv+fWJNUm0V7EoCK8c2VHOzqL9cgHnZGpLDYS6Fqe3dIMYrh9KSi1IrVmw+wlA52a11Pl5u9jYcrb1k/jnRcZY0uKFhFVEGniSEC0JKcjpO5cOmAQ6itdWGaVE+de2OX6n4GZ6GvrzGg0vjbKA7kmuYDm1kD1dFkyCNc9QpS6gyTcciQ=="
+    },
+    {
+     "by": "script",
+     "iv": "ehpRCpJsWXdMhSKn",
+     "ct": "V2YggI6goAsaf3UlGEsxFuYtjH/KjpYlUGIrNlvFNaygpZ983Vy3aKtZgD2QgGrVH8N5Lurjszz689W0YHSGETXsxEpGl9wcroiNyR/Xrusmpq2joADH3O6hwy5UooeM1UCBBm9ZxDB61fnThHqUHlFfdsestx67YdOUhrzdtcHA5YAEi2v3snH+Ae6nxXNB2dSbDgxUOpJ74P8Lv6MCoFXVDReL7fiGDv0NEXfLT/bfMQxyJlPxAghUY38FMa5WO5PrIE7/m31FRFXetSSMoeX84QBL1I3ApzBPYdItch746PaI68WmV6nOSJqBsjYGWpWRsPhroUMqFesNqQ=="
+    },
+    {
+     "by": "instructor",
+     "iv": "inueiiYcBG2CrZP0",
+     "ct": "QY/raWXtjtZi2XHdmAc6ekfxjvs9948Wa2s7qLvb7o3Z4hWM4LLGquGB3J5xWJFju/3O2qLwm0YsSfq9VouylEpxabBuzpDXUBZPa43p8VPMU/qkvKKgUIlSqujPileNlgT0eZ3LJA3dz2dVDJ6ekUlnt/mNKNG2gxBO53STSWQ5V5zF6IpUA+6inkl4XBZollZUF9owX46YRtia+JmzWR2pdJ1MTSP8yEAsGPYSvDVbK14V6Xv4hnvtzFQIYPpKJ4iD6vaAtgIyYjJBWAviFa5a3kmse0U2y9/FKHCk5K+ADvkmxyEbp2LIdDv7D0Dv22iteB/rquDU0yxL9g=="
+    }
+   ]
+  },
+  {
+   "id": "download",
+   "type": "text",
+   "prompt": "The script downloaded the ransomware itself from a website. Which domain?",
+   "hints": [
+    {
+     "text": "Check DNS lookups (stream:dns) and web requests (stream:http) from the desktop between 16:43 and 16:49.",
+     "cost": 30
+    },
+    {
+     "text": "The file downloaded had an image extension, but it wasn't an image.",
+     "cost": 20
+    }
+   ],
+   "card": {
+    "label": "Payload download site",
+    "ref": {
+     "diamond": "infrastructure",
+     "killchain": "installation",
+     "attack": "T1105"
+    }
+   },
+   "accept": [
+    "8f81c4fe44aa4b055ac92cbd817df842356ccdfe479754124487e8c702bc7550",
+    "35302e908c97285e2e2d7f06305aaca24fc8f86a033090036a45ae5111b9eeb5"
+   ],
+   "reveal": [
+    {
+     "by": "download",
+     "iv": "zsy/8Jvh0wGvXc+4",
+     "ct": "7MkpMBjgqUvfncHlaejVsH/MpWhq4AfI44ND1+nfG0sjbkGVQaAxtnYuozRSfZ0GzsSjaXYXja4vtnhnEfNentOvHAY9CoHv4LDWBRmGEztGQuKvz93ppEvLBmgUeCMFslUaquZSBlAx6P9xcjouzgXepqFhzE7R24+NwrjmPOpimVoLZLFkirDjzmu8PwD5ZtbcaFxcTRgFPp0j2iXOWFgmvQxE4D0L788YOj2kcBF+oRi6nwwnOMMbBrn61PzqiwspKKi7Gnbg+jWZK5peo1svgt6R+9Aj8ptpo6i+Rz+lufr6i0XeLUVMvm97RHXg/aqgphFOUqx1NdI2fQGwBT7yVadtedPehDQymxivffWsLEeOqQFohU44yr6QpM9wZaJ5q14="
+    },
+    {
+     "by": "download",
+     "iv": "I6kTbBtQO6xbyKfJ",
+     "ct": "T0y/+pUxLjxY6VT9RZKErCwdHtsrS7RXcjNrKDsG7asPFDag6gxgkVdDMHvZIwhTYjPo4RttgssdTql5yK+qY9av27xBYpULKngaokjVxMB2aJzA7fvwmFK+OjZFFYERwkSme/B9G46zWHX2P5s9WaflocAAjd5tIy4JMcI3U0VKr+sbxsGAJKIdAFzr3Gx0zJymrRmwLunyOsnNuzB+iN44/L6FkIxrL1u92DpPOkz2Gbx//zfA00WtCKJ8AbdwhfFLavTgfHWsT+0l/LBTckN9bj9OG4W0Zbw5ZqsSCORIc8RKD6gp63kM7Pa7mMUS+EJok8BegLQxm8JoAhHD+fqLCckd+lrMOcarJRyTpcerGUX1/5cANYpZuhclayhfZtXWFhA="
+    },
+    {
+     "by": "instructor",
+     "iv": "KiLXXj4wz1w+/PD3",
+     "ct": "KPHlhvllrC/HNjsGvUtcik96/g8tr+OSpuGbyvCDhxk1piImPqqTUbKAq6Q+De/IfT3FIQE5/QZtVj4UAcZDD7yaZIx/VKpgWw8NpII6YjYkyKjCthNwn30yBH5kyqtpUnGs7VS+A4yDy7Da5pdzYtkevitnmkmh8L+L+29+YuXGQqt/hFeyTwbK83ed0ymdJxfj6hXp604unXScV5zUW6XGEcJyzmjQfyjQkafp7ji2/EuJ+091PUyfcsPRgU3vh3HgPVB7ViIp9K+URBMRG0KyWLKIm0kl8baytxRWbgH2+814DPWNwKOfI3TLkTzlbXfQd1cn2gKxi4Nw4ZwHPmIrhIzyLk+O/6l83vdbnkudxVRwnySd8qDC8HiXaswJj8M8+FM="
+    }
+   ]
+  },
+  {
+   "id": "fileserver",
+   "type": "text",
+   "prompt": "The desktop wasn't the only victim: files on another machine were encrypted over the network. Give that machine's hostname.",
+   "hints": [
+    {
+     "text": "Encrypted files get a new extension. Search the SMB file-sharing traffic (stream:smb) for odd file names.",
+     "cost": 30
+    },
+    {
+     "text": "Find the dest_ip of that traffic, then match it to a host in the Intel asset list or in the Sysmon data.",
+     "cost": 20
+    }
+   ],
+   "card": {
+    "label": "Encrypted file server",
+    "ref": {
+     "diamond": "victim",
+     "killchain": "actions",
+     "attack": "T1486"
+    }
+   },
+   "accept": [
+    "f36439b010b4fff707384b16f86c4c2ad0feef7ad1b6e90091985267d2c67225",
+    "b4766afe677c92c00c2fc265781fd1c08921dc030b2b0fd42ac962644ec44585"
+   ],
+   "reveal": [
+    {
+     "by": "fileserver",
+     "iv": "PL1P6civl5onh9px",
+     "ct": "xI1chM2yrCrqcpVGUYGwvtGqLIh5RXV4I7vPBHLQYjxOxDxgKLFI9es6EXJTgzbUod+xMp493owjSc++bXmunvI4wt5igspbHjp7Zpjk1S9Z9yenG4RmTFzYprZpeg8QgTL2VO1yvfFWWjsC3OrLsuDwOn5EnKCQSJ0xGiWKGw5+JrUfJ/EPPkvodCVmvzJezPPLys868boxopV+KEuaXcqWXYz6DZJ4DCLqUPL74IjITjNj0r4F5qY/NUXQKrtJUc+s5BnTCglqFiYVyexAaPu2gHafmB74KfImOPZT3+6MIqR5MFkISyP/EgLmryrdHAau4/WdlNahrTTH+wMKJ/ug+hcFk4QV/z1Dl9piXIX5akkP/npihhmnOm8UVQZU98LdwBe/QLzVCgtU8QELb0hiTpy7/4z+dvRqmHjAzCwqPWBAE0m0"
+    },
+    {
+     "by": "fileserver",
+     "iv": "RkYQfTUNeEVzQobO",
+     "ct": "G6VDLA8fv/mLv11BsKycwWO26cTlK/yTj/awkMP9b6Vk85ZUD8gHdOfjfmfSWUifqvUMIBkryjeV/dgfpSovIJM0bW5BPhGSASmkxwq5cByWo/hsedsbn0wnFFQpB7tsuE3AcTWSTwILmPL+lK8YU7pcYlJ8MYShUqZZz3c85KI8CZA9VNUoR/acD6vPLQjBz4+sfA6J4yyJPnuI8ZOEeJ+4c4Jjo+owtCJDQCDA0WknHjwt9puu5ObAsNbgtKtp8bu4lNykTMgfVcxdYgpubtRDjLzs9AuKAx2TCCgxuAPC2vrTVVauc67wvKzE/WsWdGRRDibBPKkfYshxhMl9yb6a4KbioO0LZ/zH0TMRpbT6aN2owLpLiAcqMBGwHUjR0wSs/ydMSaEIRez01lHnea8B7jindLkJ7Hr02BnW7vFluryrboOc"
+    },
+    {
+     "by": "instructor",
+     "iv": "Q/GQsZFtoiXw21Qr",
+     "ct": "heDlsGAkXtPzPPFMi29PuLFxFB703cLrOMCN0cFKaDZ+6HxW1f+I24rKUOCT7RyM+sCTiOvADqyUv/lp1g4d8etI1EuJ3fumM6RXBf1+6JxkUsrXA1LrrW+CdEXU2+nuVig6hQLaYoI8+FNIZy98B0feUqm2H9fBBr4lXy+3beVDsXYe5HkXt13ILUcGYApvxWGSSqwLT3hbCfBC0C8+o3rbRGN5xwZ/XQEODHuL6wDCFlDBm/+a0wrcg7BIVbOdEaLSqPPnN4MFxpY83pWa0PpFmKB1s4H6LhWbtFRn/H/89256uEXPw9SWCH7+L5CmhvzRggw6bCmi8jC1cP52JnwAOC9GA3bZ62XUz7TFV8OaUUrqh5Ykarbk1RoL304Krrx1pOfHv7sLCH0zbnHnG6FR+p1QvdDrU+wa+CgWwR//Saih9xyE"
+    }
+   ]
+  },
+  {
+   "id": "udp_port",
+   "type": "text",
+   "prompt": "Once running, the ransomware sent a burst of UDP packets to a whole range of external addresses. Which destination port?",
+   "hints": [
+    {
+     "text": "Look at the Sysmon network connections (EventID=3) of the ransomware process in the XDR view, or check the histogram for a burst.",
+     "cost": 30
+    },
+    {
+     "text": "Open the DestinationPort field for network events from the desktop.",
+     "cost": 20
+    }
+   ],
+   "card": {
+    "label": "Check-in port (UDP)",
+    "ref": {
+     "diamond": "infrastructure",
+     "killchain": "c2",
+     "attack": "T1095"
+    }
+   },
+   "accept": [
+    "a509f8221a1759cdcd6a4e873f77db982a94b9a5cfc92ad23799f08a49f2bb6c",
+    "ae215ff21e9a9cc52aee84a87436c3fce876dac35a51f24a882598b38331facb",
+    "825944c4ba2907f6638f31bb97f0c2d77cb5a64c649d130aaec9e49710d732f0"
+   ],
+   "reveal": [
+    {
+     "by": "udp_port",
+     "iv": "1u/2/+epgNkZ8wDw",
+     "ct": "iOh9jJ3cH+BEnl5sWwGsApUYs/qw3goCq+QgnyjJXlV45siMlvqCXiUAckSRMMtkT5Lg5qi+0s/0GEUbMWvwBeuxCwVoExxewnpo4VzO59pUyWbW/YayfiSFwX7iL6fVSgeQ93c6lXMA8sWb/M6TJ6A0F88mgLj45MMKh7utUk/PxhnLIwPw4z3wCTG7nDizk4Zd/Qs4VNx9Q4CN+H0+c1DL1IH6uUXU9wxSbC+rITX0xrBmF9oSR7ZmIvopebZ4ZR/lCXJYIWgEolLK8MthX1swchxGUJm66UbR0oWVgjW5LO/YzROe8yJF+Brdr/cBLy1fwikxhvu9HHSsuq85XR82K3AYh0wSgu/orKrHAPNry2XGGJauq+N4DTZ5arcoTWeg1JE9lXksxzNdQd2uc92KYSg2goNPiRyo"
+    },
+    {
+     "by": "udp_port",
+     "iv": "ewsVB0mV+/hjq6wl",
+     "ct": "A28Uw089cIOxXYAerDwPUxilebXlhnyQypc54Utzco9J96AaHMnxx9ZCTZBWtb0FsmwQ87SJdu4YhKtK5PRAA3UgxdZUxD0qNBTfH9zRP3cDitI/dDyLtU5LTvvNejsa8uzZS4H3c2RgtCg9gpXrNs7QsBjR/QEsMv1OebnhbtDnLeSc28LbEeq5RSGZ+BbCyHb3F1xvm7AQyJZ/aceJZSs5rlXbx81IX28fUsDv6tzD7yUT94JGx8PGh/dZiFsq+3OO6Ih7JLp6+XgD2L5BNE+ffiR1NEKgcUZay1/oz7f8cPh16qgx981JwmkN81ASQaZ4mpvVP2rTalDiz1dwaUKeXtW8i7NqgRr1tpM99L/HuRP6+Q2CO2kxwEvnyJNDufiq2EmRKgoM3JDkS3w5UBYWc0x2oaVStebi"
+    },
+    {
+     "by": "udp_port",
+     "iv": "JyQ58P9Fv86QfdE4",
+     "ct": "jKvOnxQ/5xjLWg4UnpOGlJt+mZbo2pG2fp8al186507r+nZXPi2U3lc5xhaUtD+BFbWjRy1wTXsU7vwbtyJ+6b7UnKIwsqymfPZRyaaN3ytbr86n7h3/SZUnEeMhHN+5Q3qiEjxjFY8PcJFpFx2WXlgBuWTZoZ+75utznChofmDe1kqBDTA40rWGebFqHdUJaev+wTj4vY/FMkcZCvanpQ0AQC9Fwj8XZ9BIPawM+o3ph9Ip49KHp54/2GyQtMRu9SZPfOc8g2+BHnJeahXxlq06t/QBCDYyBXOcRFKdUFN/RBgKGvPh7uullVssacSCfxAZc/pOyZwU1hT2avqhiF0JTSScO025gNXv1xoFybGmkyqzlmxzA6WcdlvmAVpzUaFkKxvqzc1E+umEpUGkbH8fSEo3d8Zgo7mj"
+    },
+    {
+     "by": "instructor",
+     "iv": "JquEDPS+MJ40K1oN",
+     "ct": "7ON16EXZlyH/UCiSXbQWpEBj/sd64vQD9LfiZZ6spesVHqTeh6bqff9BphKY/pvK7jwlab7mLErhPFRuuvMlTFTbYdG9zFnwzWdcTzs6yLWnqhxmP1HDsDeiSedK3NksRUq6NPi0cf4F0Zn10Km9eRqAL+XPZL31l6OE5BrQGnA4OA9LIf6HH6hF7eUq+2it0Fk5ec1Kb9jgaL5l4DnNAgLGtWg94pacHrr9IUcT5/SeAIs9vZBXyZ9ehyYvSxlBEm2MlhakhbCOP5OXCB24U5ODjCbzAfvvAbkBEB5YgHt6MvB7ZtSbDkLAMMh4UIMRHaqMwEyISsMsTtW84g/V6yJVvht2mMADQ+s0xrs9maH47XlpksR1J0YOEwNTJvAhQ395Ud0IyA8MC/LQKZMwKXQk2IssNwpMd6w4"
+    }
+   ]
+  },
+  {
+   "id": "pay_domain",
+   "type": "text",
+   "prompt": "As the ransom note appeared, the ransomware looked up a domain to send the victim to its payment site. Which domain?",
+   "hints": [
+    {
+     "text": "Check DNS lookups from the desktop around 17:15.",
+     "cost": 30
+    },
+    {
+     "text": "One of the IDS signatures mentions an onion domain.",
+     "cost": 20
+    }
+   ],
+   "card": {
+    "label": "Payment site domain",
+    "ref": {
+     "diamond": "infrastructure",
+     "killchain": "actions"
+    }
+   },
+   "accept": [
+    "9b5cda59cf5d19f4304ffd322216dfff48dfbd376bcb6319c64374d6dfffd4ae"
+   ],
+   "reveal": [
+    {
+     "by": "pay_domain",
+     "iv": "mB01zjjw33CZigGK",
+     "ct": "QWp+rUct0Ekhqad3HQdrBJngYD8heKGoULnF5LdY6meCuEbCmV9f9oQ0BLCBBaB5pcSHtNlu/XS6dMcHXGrId3f68CaggUd4GKkk8Pgog3hhoIVhb3mu8U8sKeErTVSuKVl8YGaMAMTYDyb0gfjuv7ZtI1d4eRBOvKaMru3ud/HY3sBq4ToyvlZ/kLmHKcr8iy4E6u2AwTl467XS8ce27y5LTSxjOiqW6DCxWSQq7xbFRyWdxfIpWaXaiTmMtwmt8JHomilnJ9uLvSywxHsmSglujU4XUt8bSxSt2HcUgbmu"
+    },
+    {
+     "by": "instructor",
+     "iv": "nJ34kG13G/Uv3VTS",
+     "ct": "8o4agWsbZD8h/+ODObfG+tlgQdpIejwPMugYVWkt4kS0U8bLe3kx+D2+/TumkW2bG6qvkoz/zWNBzHqaz22p1C9kh+yOAohkHH6Wu3kG1/2ThN7tAzmNNjpC7c4aiJ85MHtlQvs1cEyFIzHa76Mswz06QKT3lMpqeZc4kLz8mX8nCWGN/uU6NFk2Ltj2s5b2HNyCXSYyIjvPZ8kN/A6po0Ya0BoW7OUF8MRd2N2l8HV4Gzxrj5ONG9Z8r41nXj6dryzw9tdzaIUWEUa7aLiOg+MHWz6RgdP5+zeYSrXVoxHl"
+    }
+   ]
+  },
+  {
+   "id": "contain",
+   "type": "decision",
+   "prompt": "It's 17:25 UTC. What do you recommend?",
+   "context": "What you know: one desktop is infected; files on the main file share are encrypted; the infection came from a USB stick; nothing yet shows other machines infected. Last night's backup of the file server exists, but nobody can say when a restore was last tested.",
+   "options": [
+    {
+     "id": "restore",
+     "text": "Disconnect the desktop and the file server from the network now, then restore the file server from last night's backup.",
+     "feedback": "This stops any further encryption and gets staff working soonest, if the backup is recent, complete and not encrypted too. Has anyone tested a restore? (Recall S13's triage scenario 6.) Restoring before you know how the malware arrived risks reinfection when the USB stick comes back."
+    },
+    {
+     "id": "readonly",
+     "text": "Isolate the desktop only. Keep the file server online but read-only while you work out which files were hit.",
+     "feedback": "This keeps the business running on the files that survived and causes the least disruption. It's risky if anything else is infected, because the server stays reachable. You need to be confident the desktop was the only source of encryption."
+    },
+    {
+     "id": "shutdown",
+     "text": "Shut down every Windows machine on the network until you've confirmed nothing else is infected.",
+     "feedback": "This is maximum containment, and very defensible while you don't know the scope. But it halts the whole business, and powering machines off destroys memory evidence. The CFO will want to know how long, and you won't be able to say."
+    },
+    {
+     "id": "pay",
+     "text": "Isolate the desktop and pay the ransom to get the decryption key quickly.",
+     "feedback": "Some organisations do pay, usually on legal and insurer advice. Payment funds criminals, can be illegal if the group is sanctioned, doesn't guarantee a working key, and marks you as someone who pays. With working backups it's rarely necessary, and it's a decision for executives and counsel, not the SOC."
+    }
+   ]
+  },
+  {
+   "id": "soar",
+   "type": "reflection",
+   "prompt": "Looking ahead to next class: which of these steps should a playbook do automatically, without waiting for a person? Tick all that apply.",
+   "options": [
+    {
+     "id": "case",
+     "text": "Open a high-priority case when an IDS signature names a ransomware family",
+     "feedback": "A good automation candidate: fast and low-risk, and a person still decides what to do."
+    },
+    {
+     "id": "enrich",
+     "text": "Look up the infected machine's owner and asset details",
+     "feedback": "Enrichment is the classic SOAR task: pure lookups, no risk."
+    },
+    {
+     "id": "isolate",
+     "text": "Cut the infected desktop off the network",
+     "feedback": "Often automated for confirmed ransomware, because minutes matter. The risk is that a false positive takes someone's machine offline. Many teams automate this for workstations but require approval for servers."
+    },
+    {
+     "id": "disable",
+     "text": "Disable the user's account",
+     "feedback": "Usually needs a person. It locks someone out of their work, and this user was a victim, not the attacker."
+    },
+    {
+     "id": "restore",
+     "text": "Restore the file server from backup",
+     "feedback": "Keep a person in the loop. A restore overwrites data and must wait until the infection is contained."
+    },
+    {
+     "id": "ransom",
+     "text": "Decide whether to pay",
+     "feedback": "Never automated. It's a decision for executives, legal and the insurer."
+    }
+   ]
+  }
+ ],
+ "debrief": {
+  "chain": [
+   {
+    "time": "16:42",
+    "phase": "delivery",
+    "attack": [
+     "T1091"
+    ],
+    "by": "usb",
+    "locks": [
+     {
+      "by": "usb",
+      "iv": "3Byncg9t1nR+uxut",
+      "ct": "JASbI876EQxx3nrli+6LLivTGHxNJ76FvrS0C/j3pRl56NP2aNp4Hb1iVP4NOLop3qvSBfF19V+3jP940euWBBrKAt1RB0lMqQ=="
+     },
+     {
+      "by": "instructor",
+      "iv": "sN4wQtileJ94qYh3",
+      "ct": "lTtKM+2P4IT209aaLCX8+99LJ/x8Hro+1N7iolwLkR201JxFJcvORK4+5FKqGXZsknu+Ah+shPk+KtRD6Fp+r8d7Zpq+uNSpwg=="
+     }
+    ]
+   },
+   {
+    "time": "16:43",
+    "phase": "exploitation",
+    "attack": [
+     "T1204.002"
+    ],
+    "by": "doc",
+    "locks": [
+     {
+      "by": "doc",
+      "iv": "kxgaBfYQESc3wbCM",
+      "ct": "cVJyuTyyUkqpoWukvNxjbd4rYisJ+88LbxQNyuah5gOM+K2l7389JzK2u5rZDl9I9hGbVK3B6FOZKu6qKnXJHeXOspLyLYEubtTG8sO5QmANm/xUxRwRGUtNZnHXBcOjBmMOm6v0vlA9jCY2PARTfA=="
+     },
+     {
+      "by": "doc",
+      "iv": "Bhk+iZ8IrFQ1aWpF",
+      "ct": "XuNVfJLWokXv+zV47DxpN7m3aOz00jUjhdKVh0eTycyyc1+UMpBNsa8mHzui+UfAKgizKZWg2ASstPy1pjtZeOjU+dSIRxpaqEIFpG+0WFZ4EB5WBfSfzqqRrIcE0iukEnzrDVmguPRU1+Pmw1H+bA=="
+     },
+     {
+      "by": "instructor",
+      "iv": "+ATtg65xD8msbgv1",
+      "ct": "VXL0F/LDYo+0aiC2xG6LHIkmGn31Ia9Zrs+f5xCjd0m4q4I1dQJOoHdQmYFfMTU3wMx/rlgOL6s5gXwlAnRCGIm1sx6YZlf+L/JGbhGvaWf/w4xYGYP6E5BYSS7lzbDluiAwrDlN4W3gVp1YcA7pgA=="
+     }
+    ]
+   },
+   {
+    "time": "16:43",
+    "phase": "installation",
+    "attack": [
+     "T1059.005"
+    ],
+    "by": "script",
+    "locks": [
+     {
+      "by": "script",
+      "iv": "lCO7vQ0DuaIEX+bZ",
+      "ct": "qAINtSvD6L/ErE8vs3GDw6sd/JLWoGESekhVAhXXtnyWUk2c6/hrFGBLeEw96Yyo7HnQABr+G5cvQg1g40FBiUtQ5RHcj/C+a4JWpZJ/fKI7C1wPfv4sEgdTxT4QOmYujCIXx+hECQ=="
+     },
+     {
+      "by": "script",
+      "iv": "JIyFZZInYaXYxUPD",
+      "ct": "gMHqSjwBKh9ZnydlGwnNvhFW85m6leGj8/FrfWPxV+0qar9gVo6t2LVGiKqxZbnLBUErPJHQidIxAfCAtoKQqvj3UO/Ojv26/mvOhSm8dWtX53MaAn6IHOHhQX/JHJ0UFtKwmaCg0A=="
+     },
+     {
+      "by": "instructor",
+      "iv": "gounX5JNN29nzZci",
+      "ct": "P+9i11lsJUCDzKz/xRQ08cCwgtpz1e4v7TgRLWXOr3gTX49Uy6BheCywiTOYdwUzkH2p76EjZlfvcmNSBlzIFbj95mKZ7HXR1YCJuWx27euL+mtHB7B0hF5br+HNlJKjPbcxP8SrsA=="
+     }
+    ]
+   },
+   {
+    "time": "16:48",
+    "phase": "installation",
+    "attack": [
+     "T1105",
+     "T1036"
+    ],
+    "by": "download",
+    "locks": [
+     {
+      "by": "download",
+      "iv": "FdZijphvxCl5AJjk",
+      "ct": "bwVz+UbjZs5YQrMXXciuqYp+3kMXdCv5iRQDTGDr8tUBPEqGKA+WZWChAGeaNMoPtA/FVb89LxTqS+nPyXPaEfnrpzS6hPJMmhd4ojjQERYwwqQ/Z3K5XTzDKJe1WtPWpmOPc3SjY9ms/FPiaa7oHNfH2k4Uy5EFPhKMptQSMg=="
+     },
+     {
+      "by": "download",
+      "iv": "n5c7AK462shX3jFr",
+      "ct": "KMcZwpkDBanK0Q+Ew6lebWLw8LrmoQ6xN2G04t28aeAeCt6/hMMm3VVpUj94Nwwo95A4YJHmVymixuFfSWEXbroC6LxNrN9jFh4O+4hOP8RGXKeopVQhRxPL3MG08/11Jxi9TvB5TqNjwP3BV6fVrRjAaXYdyctvl04Mad5OnQ=="
+     },
+     {
+      "by": "instructor",
+      "iv": "UFYnvwF0t1cvtWGr",
+      "ct": "jzyjttrOjaVlg0PQ8RQwVoqWOqXxIbfLkewdN/ZkYD3WjCwXVK84TRQX79d5oI2PzE8kFzER5W/e2lxZhycDTkkmCJeA5RstqNGgSmsiUYu5c8MKuw4jrMRv1orTHVjO3QfBrNUdkXYUhxnLfO0j0jt/ryb02YVqYG7Gd7/UCQ=="
+     }
+    ]
+   },
+   {
+    "time": "16:48",
+    "phase": "installation",
+    "attack": [
+     "T1036"
+    ],
+    "by": "family",
+    "locks": [
+     {
+      "by": "family",
+      "iv": "hfJG6xepooFgeWmZ",
+      "ct": "jqO6IVvg28OESdzKHTjJY6GW3MQcEiKyPvGWAQTEV6BtYp0VKmhapS/kiRyLrLvL3iVG+T/PopYR/MH+lCTRcXQeYYyAHLw4YROj9yonLwKUS/FQaHvelqc34fQZ7g9M3KImA9H8"
+     },
+     {
+      "by": "family",
+      "iv": "7y5i0l8T/BUF2kqJ",
+      "ct": "blCJZ3GoG9gT/zaUslm8fhA8X9x8KREPcmQsYyLoH6qkf/0yZ+9F1JzFqvmrhMGRc+k3jvWVYYiJlvZ5iAzNAciACSOBPhMoiKW9iRswo/jqHRUdRLES24Fur2J3qqP58NRvZvMd"
+     },
+     {
+      "by": "instructor",
+      "iv": "S3JJzKwywOPURxrk",
+      "ct": "wUHyiTtiZ3SiiGoTsyO0zXTWXAKXNZpdiNSvsds7VBZ/Rgbn6qlO/PVuiaLzVpHWaAmeb5Dt6QZUJSQ8Bf8G+7sd25tB3lWdOMr2hrBKoN74NfwyPOLkOOegYpGx69e01fAHDntN"
+     }
+    ]
+   },
+   {
+    "time": "16:49",
+    "phase": "c2",
+    "attack": [
+     "T1016",
+     "T1095"
+    ],
+    "by": "udp_port",
+    "locks": [
+     {
+      "by": "udp_port",
+      "iv": "at1gE5CPDMGLQzUp",
+      "ct": "YfDm7TR6qkTww4by2aThDL1x1qGp7y5k2tCwmIF4YHyzXiPUS7xtOopkn1kGCZvj0vK80ZjB43BAyvILhHLeNF3YlBhMzDaUoBSfllZtxSuGSU+Vte4d5sJFxsXkR58mC6Yk6DN6bglSxx+eSWwcXXHILeLHGbe/XDb6LjmGjc5S4sLdH+ksiPQVXCW43RxeqxOK4KWB92HUYm0HYlUgQTG6gC0YZNy21u0="
+     },
+     {
+      "by": "udp_port",
+      "iv": "u3M53kOXCPyjg/S0",
+      "ct": "uZENpft4obhnLFBOhILQUH0LOnGNDiq9ST3zR+IgBiya8xmx16icKxBSJO9Qp4pThJuDrCQFU+YkhfK9Q+6iFIUqzRsA6cTlE6Cd+bFz4ceoclaj+ndRLpYWphZlU9r2VWrVLGAGbbiojZ93oe5YVT4lYU7Nw/I3DYi1ZbNvGHRVYo1ddPcGM82LPk3ESmA9EDLK5WVio+JX3rkdaEzF9Zb8+xA+VVp0Qt0="
+     },
+     {
+      "by": "udp_port",
+      "iv": "turPBqSGd0N/PaoN",
+      "ct": "5DDYrjsxHxebMDUpo5KGaLTL2n5Gqm6c4joN3a0fSR9o329RmxpRMSddMgkEkUpgM170N4jY+sHE3rgJKZSTEdGFqrb9924bvhV3IKZvZlvy4Ji8Oe5DBRnW9X/QUgVy6FGUzMMUyfEM0p9qSCg8LGP3LBjYpUNq+q+Xmlb8NZiLcuo/Y9DhSroahIpdIau/FpGgc6JFvbKL+Fma4qaSlJGQlnv+pMX8dfA="
+     },
+     {
+      "by": "instructor",
+      "iv": "U95y/tEG8KHp8IWl",
+      "ct": "ex309bkH5oVl5mJ6eCQwI4evtp10YSD6lvoCThPUKJRkyUnSNWwxV+5aRUgc3jlPVUG+mFCWwZWhTOcRxQlL0w+U34USV4eAUNmxi6zpLX6s86b7b6mWR3n4p16kMehgtIdEGbg6X6zL1F5RDtTDgbajCKQwf8j4lEDK7s/8XKcUPbeBXw+dSLTaDqOyQ5Dlv9MlzSD91T35KAicasqY30zbRk6PBYKkSxY="
+     }
+    ]
+   },
+   {
+    "time": "17:04",
+    "phase": "actions",
+    "attack": [
+     "T1486"
+    ],
+    "by": "fileserver",
+    "locks": [
+     {
+      "by": "fileserver",
+      "iv": "PPi3BSx0UhnXZflg",
+      "ct": "AtUSQtzz333wvlN9dmAYYk30FDgALcnqZ0WKcxiUXuano2ZxV9tmC3q+LDqTgbzWwUWWtMZH3SXgh/ji0VcMvd5pLC85YPg6uBmRNe9ppPrb1cd7Gh+L9O5f+Wvy5CjFWxtV4RjfQHIFkyOJAxOsTeG+gvh/AOT8IEjnKA=="
+     },
+     {
+      "by": "fileserver",
+      "iv": "PjnaAFKtZCNIbqvR",
+      "ct": "tP7aupLqo/dCJ1N2zAe2Z4mmLPcvfFpNdJjV0CeODgmkD8TqF/YMmc13qVMq6gSvo748ieVSWgin1CrqDwr0PxAo+nAY2KyccexrxMxKY05eVZKuTyR79zDEYHXl8U1HeHFni58B0w5URVosINczJI646VK/46tP+eUnNw=="
+     },
+     {
+      "by": "instructor",
+      "iv": "+4ZJe2HZnIplkvjY",
+      "ct": "AvdoP8nQayxQwQIlRoh1cVFb0lEghxKp4e2WO5gmRqEU4IJJY3tsCZBZ8tP0PXNxB2zkXAs4ZqwAgx9zOWApOufTYkpcQvoSaAuAlJQ5/uwp1l7RL7K7jJ6JF+WCNnQpGxcoK7IAxDdSv57XAMMc0ss0KK3WW5IvOK8coQ=="
+     }
+    ]
+   },
+   {
+    "time": "17:15",
+    "phase": "actions",
+    "attack": [
+     "T1486"
+    ],
+    "by": "pay_domain",
+    "locks": [
+     {
+      "by": "pay_domain",
+      "iv": "STnKVgcHJdlua6SB",
+      "ct": "1ZzZ2Ui+zUEsOQCHdLJ7o+l8miZikDp3rxSCkXjkh/Kfs7dB37FqNwl9z4mJ7m6xGSUeMw/pUPeq2pUib0SFPVAqvtEzBd+SxofFOlbYvVLU22agzFpCmIq62D4CytLIscQ0mxb+D2mvp4YoO8RcvYO9Gv47XKSDesU9gYH7K5w8dasM4fx3oFLWcvPSjdCSHOab2CO8RmoIjGrfgIYbCJJyrY6PwDzXnPY1Drw="
+     },
+     {
+      "by": "instructor",
+      "iv": "h0t3uk3RMZuE0bxh",
+      "ct": "jNuudWqBcHLkdHdNfsct0VmQXI3YX3TWXoo4EeiffufnfTzNXjhZgnNudfSqwMft5E0Y8AsH9vLXSxp1ylfEQ/VW59PDc9IoZRc+uVoPoJ6uMBfQuNLtXTtePn3CpOpMY2cOr1htOQaKmVioA8AFi3wAKK31W+upeqNyyvcd5vz3OFsWn4mz5oCbS3tUcLCViGTF1A0cE3KU0vYfxMExStj8Vq4XOtKEMveOOBo="
+     }
+    ]
+   }
+  ],
+  "cfo": "CFO pushback to prepare for: \"We have backups. Why is anyone even talking about downtime?\"",
+  "connections": [
+   {
+    "session": "S13",
+    "text": "Triage scenario 6, backups versus ransomware. A backup only counts if it's offline or immutable and you've tested restoring it."
+   },
+   {
+    "session": "S12",
+    "text": "Least privilege. The file server lost files because one user's account could write to the whole share."
+   },
+   {
+    "session": "S14",
+    "text": "Hardening. Office macros from untrusted files and USB storage are both controls you can switch off by policy."
+   },
+   {
+    "session": "Threat actors",
+    "text": "Compare your two Diamonds. The defacement's adversary signed their work; here the adversary vertex stays nearly empty. That's typical of commodity ransomware: you know the capability well and the person hardly at all."
+   },
+   {
+    "session": "Next class",
+    "text": "Incident response. The same ransomware arrives at Brackwater Provisions, and what you learned today is your threat intelligence."
+   }
+  ]
+ },
+ "instructor_check": {
+  "by": "instructor",
+  "iv": "TTh6D7AVuEMXtUQd",
+  "ct": "pNtOsS5CVwl3eIg+iUQ5Q/Es"
+ }
+}

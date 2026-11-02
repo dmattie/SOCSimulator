@@ -1,0 +1,12 @@
+{
+  "entries": [
+    { "ioc": "192.168.250.100", "type": "asset", "title": "Internal asset: user desktop", "note": "Windows desktop with Microsoft Office 2010, assigned to one member of staff. Its hostname is in the host field of any endpoint (Sysmon or WinRegistry) event from it.", "tags": ["desktop", "workstation"] },
+    { "ioc": "192.168.250.20", "type": "asset", "title": "Internal asset: file server", "note": "Windows file server holding the shared drives staff map as network drives. Also forwards internal DNS lookups, so the desktops' DNS queries go through it.", "tags": ["file server", "dns"] },
+    { "ioc": "192.168.250.70", "type": "asset", "title": "Internal asset: public web server", "note": "Hosts the company website. Not involved in this incident as far as anyone knows.", "tags": ["web server"] },
+    { "ioc": "ipinfo.io", "type": "domain", "title": "Public 'what is my IP' service", "note": "A legitimate service that returns the caller's public IP address and approximate location. Malware often calls it to learn where it's running, for example to skip some countries or report victims.", "tags": ["ip lookup"] },
+    { "ioc": "osk.exe", "type": "process", "title": "Windows On-Screen Keyboard", "note": "A genuine Windows program that lives in C:\\Windows\\System32. A copy anywhere else, especially in a user's AppData folder, is malware borrowing a trusted name.", "tags": ["on-screen keyboard", "masquerading"] },
+    { "ioc": "wscript.exe", "type": "process", "title": "Windows Script Host", "note": "Runs .vbs and .js script files. Office applications have no normal reason to launch it, so Word → cmd.exe → wscript.exe is a strong sign of a malicious macro.", "tags": ["vbscript", "script"] },
+    { "ioc": ".dotm", "type": "file-type", "title": "Macro-enabled Word template", "note": "Like .docm, a .dotm file can carry macros: code that runs when the user enables content. Many organisations block macros in files from outside or from removable media.", "tags": ["dotm", "macro", "word"] },
+    { "ioc": "usbstor", "type": "registry", "title": "USB storage in the registry", "note": "Windows records every USB storage device it sees under HKLM\\SYSTEM\\CurrentControlSet\\Enum\\USBSTOR, including the device's FriendlyName. Useful for working out what was plugged in and when.", "tags": ["usb", "removable media"] }
+  ]
+}
